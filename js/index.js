@@ -187,7 +187,7 @@ window.addEventListener('resize', onWindowResize);
 function render() {
     requestAnimationFrame(render);
     controls.update();
-    graph.rotation.y += 0.01 * clock.getDelta();
+    graph.rotation.y += 0.1 * clock.getDelta();
     renderer.render(scene, camera);
 }
 function HSVtoRGB(h, s, v) {
