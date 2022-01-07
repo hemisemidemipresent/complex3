@@ -104,7 +104,7 @@ function createMesh() {
     plane.computeVertexNormals();
     var mesh = new THREE.Mesh(
         plane,
-        new THREE.MeshStandardMaterial({
+        new THREE.MeshLambertMaterial({
             vertexColors: THREE.VertexColors,
             side: THREE.DoubleSide
         })
