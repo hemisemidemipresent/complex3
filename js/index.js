@@ -82,12 +82,16 @@ function createMesh() {
         re /= multiplier;
         let input = new Complex(re, im);
         let output = func(input);
+
+        let legend = document.getElementById('legend');
         if (!isModArg) {
             plane.attributes.position.setZ(i, output.re);
             let sigmoid_im = sig(im);
             colors.push(sigmoid_im);
             colors.push(sigmoid_im);
             colors.push(sigmoid_im);
+            legend.innerHTML =
+                'height of surface = real part of output<br>color of surface - white = bigger Im, black = smaller Im';
         } else {
             plane.attributes.position.setZ(i, output.abs());
             let arg = output.arg() / Math.PI / 2;
@@ -96,6 +100,8 @@ function createMesh() {
             colors.push(color.r / 255);
             colors.push(color.g / 255);
             colors.push(color.b / 255);
+            legend.innerHTML =
+                'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
         }
     }
 

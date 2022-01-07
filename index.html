@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Complex function grapher">
-    <meta name="keywords" content="complex, function, website, JavaScript">
+    <meta name="description" content="A complex function grapher that support Re-Im and Mod-Arg 3D plots">
+    <meta name="keywords" content="complex, function, 3D, website">
     <meta name="author" content="hemisemidemipresent, hemidemisemipresent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complex Function Grapher</title>
@@ -18,17 +18,18 @@
     <div id="container"></div>
     <div id="title">
         <p>
-            grid = input plane of complex numbers (ℂ)<br>height of surface = real part<br>color of surface -
-            white = bigger Im, black = smaller Im
-            <br>
-            This website uses <a href="https://github.com/infusion/Complex.js">Complex.js
-            </a>
-            <br>
-            To input a function, simply manipulate the <code>input</code> variable using javascript
-            <br>
-            and return the value as if you are writing a function (because you are)
-            <br>
-            <textarea id="fn" type="text">return input.pow(3).div(100).add(new Complex(1,1))</textarea>
+            grid = input plane of complex numbers (ℂ)<br>
+        <p id='legend'>height of surface = real part<br>color of surface -
+            white = bigger Im, black = smaller Im</p>
+        <br>
+        This website uses <a href="https://github.com/infusion/Complex.js">Complex.js
+        </a>
+        <br>
+        To input a function, simply manipulate the <code>input</code> variable using javascript
+        <br>
+        and return the value as if you are writing a function (because you are)
+        <br>
+        <textarea id="fn" type="text">return input.pow(3).div(100).add(new Complex(1,1))</textarea>
         </p>
         <p id="err"></p>
         <div id="conv">
