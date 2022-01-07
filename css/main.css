@@ -28,13 +28,13 @@ body {
 	left: 20px;
 	top: 20px;
 	background: rgba(36,36,36,0.69);
-	padding: 1em;
+	color:white;
 }
 a{
 	text-decoration: none;
 	color:aquamarine;
 }
-input[type="text"] {
+textarea{
 	font-family: 'Courier New', Courier, monospace;
 	width:33em;	
 	height: 2em;
@@ -52,3 +52,19 @@ input[type="text"] {
     font-family: "Computer Modern";
     src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunss.otf');
 }
+@media only screen and (max-width: 600px) {
+	#title {
+		position: absolute;
+		left: 5px;
+		top: 5px;
+		background: rgba(36,36,36,0.69);
+		padding: 0.5em;
+		width:100vw;
+		height:25vh;
+		font-size: smaller;
+	}
+	textarea{
+		width:90vw;
+		
+	}
+  }
