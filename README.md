@@ -1,6 +1,6 @@
 # complex3
 
-A web-based grapher for complex functions
+A web-based complex function grapher
 
 Uses complex.js and three.js
 
@@ -10,3 +10,4 @@ Uses complex.js and three.js
 -   [ ] Logarithmic height option
 -   [ ] Export to a `.stl` file 3D printing (probably defer [this](https://github.com/eligrey/FileSaver.js/) or smth)
 -   [ ] Optimize reloading
+-   [ ] shiny surface
