@@ -25,11 +25,15 @@ const color = 0xd69dff;
 const length = 10;
 let multiplier = 10;
 let isModArg = false;
+let isRotate = true;
 
 let resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
 let graph = new THREE.Object3D();
+let grid = new THREE.Object3D();
+grid.name = grid;
 scene.add(graph);
-
+createText();
+createGrid();
 load();
 render();
 onWindowResize();
@@ -48,7 +52,7 @@ function makeLine(geo, color, lineWidth = 10, opacity = 1) {
         lineWidth: lineWidth
     });
     const mesh = new THREE.Mesh(g.geometry, material);
-    graph.add(mesh);
+    grid.add(mesh);
 }
 
 function createGrid() {
@@ -67,15 +71,17 @@ function createGrid() {
         line.vertices.push(new THREE.Vector3(length, 0, i));
         makeLine(line, axesColor, width);
     }
+    graph.add(grid);
 }
-function createMesh() {
-    var width = 2 * length; // 20
-    var height = width;
-    var segments = multiplier * width;
-    var plane = new THREE.PlaneBufferGeometry(width, height, segments, segments);
 
-    var colors = [];
-    for (var i = 0; i < plane.attributes.position.count; i++) {
+function createMesh() {
+    let width = 2 * length; // 20
+    let height = width;
+    let segments = multiplier * width;
+    let plane = new THREE.PlaneBufferGeometry(width, height, segments, segments);
+
+    let colors = [];
+    for (let i = 0; i < plane.attributes.position.count; i++) {
         let im = (i % (segments + 1)) - segments / 2;
         im /= multiplier;
         let re = (i - (i % (segments + 1))) / (segments + 1) - segments / 2;
@@ -87,9 +93,7 @@ function createMesh() {
         if (!isModArg) {
             plane.attributes.position.setZ(i, output.re);
             let sigmoid_im = sig(im);
-            colors.push(sigmoid_im);
-            colors.push(sigmoid_im);
-            colors.push(sigmoid_im);
+            colors.push(sigmoid_im, sigmoid_im, sigmoid_im);
             legend.innerHTML =
                 'height of surface = real part of output<br>color of surface - white = bigger Im, black = smaller Im';
         } else {
@@ -108,7 +112,7 @@ function createMesh() {
     plane.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
     plane.computeVertexNormals();
-    var mesh = new THREE.Mesh(
+    let mesh = new THREE.Mesh(
         plane,
         new THREE.MeshLambertMaterial({
             vertexColors: THREE.VertexColors,
@@ -116,8 +120,10 @@ function createMesh() {
         })
     );
     mesh.rotation.x = -Math.PI / 2;
+    mesh.name = 'mesh';
     graph.add(mesh);
 }
+
 function createText() {
     const loader = new THREE.FontLoader();
 
@@ -158,9 +164,7 @@ function createText() {
         graph.add(ReMesh);
     });
 }
-function fn(input) {
-    return func(input);
-}
+
 function load() {
     let inputBox = document.getElementById('fn');
     let errPara = document.getElementById('err');
@@ -169,14 +173,14 @@ function load() {
     try {
         func = Function('input', inputBox.value);
         errPara.innerText = '';
-        clear();
-        createText();
-        createGrid();
+        clearMesh();
         createMesh();
     } catch (e) {
         func = Function('return new Complex()');
+        console.log(e);
     }
 }
+
 function throwInvalidJS() {
     var errPara = document.getElementById('err');
     errPara.innerText = 'Invalid JS';
@@ -192,7 +196,9 @@ function onWindowResize() {
 function render() {
     requestAnimationFrame(render);
     controls.update();
-    graph.rotation.y += 0.05 * clock.getDelta();
+    if (isRotate) {
+        graph.rotation.y += 0.05 * clock.getDelta();
+    }
     renderer.render(scene, camera);
 }
 
@@ -237,8 +243,8 @@ function sig(x) {
     return 1 / (1 + Math.pow(Math.E, -x));
 }
 
-function clear() {
-    for (var i = graph.children.length - 1; i >= 0; i--) {
-        graph.remove(graph.children[i]);
+function clearMesh() {
+    for (let i = 0; i < graph.children.length; i++) {
+        if (graph.children[i].name == 'mesh') graph.remove(graph.children[i]);
     }
 }

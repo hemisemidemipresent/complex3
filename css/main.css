@@ -65,6 +65,13 @@ textarea{
 	}
 	textarea{
 		width:90vw;
-		
 	}
-  }
+}
+#loadBtn{
+	border:1px solid white;
+	padding: 0.5em 1em 0.5em 1em;
+	margin: 0 0 1em 1em;
+	border-radius: 0.75em;
+	background: none;
+	color:white;
+}
