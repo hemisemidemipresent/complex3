@@ -78,7 +78,7 @@ function createMesh() {
     var colors = [];
 
     for (var i = 0; i < plane.attributes.position.count; i++) {
-        let im = -(i % 21) + 10;
+        let im = (i % 21) - 10;
         let re = (i - (i % 21)) / 21 - 10;
         let input = new Complex(re, im);
         let output = func(input);
@@ -127,9 +127,11 @@ function createText() {
         ];
 
         let ImMesh = new THREE.Mesh(Imlabel, materials);
-        ImMesh.position.x = -length;
+        ImMesh.position.x = length;
         ImMesh.rotation.x = 3.14159 / 2;
         ImMesh.rotation.y = 3.14159;
+        ImMesh.rotation.z = 3.14159 / 2;
+
         graph.add(ImMesh);
 
         let Relabel = new THREE.TextGeometry('Re', options);
@@ -141,6 +143,7 @@ function createText() {
         ReMesh.position.z = length;
         ReMesh.rotation.x = 3.14159 / 2;
         ReMesh.rotation.y = 3.14159;
+        ReMesh.rotation.z = 3.14159 / 2;
 
         graph.add(ReMesh);
     });
