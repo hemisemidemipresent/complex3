@@ -11,7 +11,6 @@ body {
 	background-color: #333333;
 	color: #ffffff;
 	padding: 20px;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 }
 #container {
 	position: absolute;
@@ -33,6 +32,7 @@ body {
 a{
 	text-decoration: none;
 	color:aquamarine;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 }
 textarea{
 	font-family: 'Courier New', Courier, monospace;
@@ -50,7 +50,7 @@ textarea{
 }
 @font-face {
     font-family: "Computer Modern";
-    src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunss.otf');
+    src: url('../fonts/cmunss.otf');
 }
 @media only screen and (max-width: 600px) {
 	#title {

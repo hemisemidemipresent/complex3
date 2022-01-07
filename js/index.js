@@ -1,12 +1,11 @@
 const container = document.getElementById('container');
 
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-// var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 1000);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(25, 2.5, 25);
-var frustumSize = 69;
+const frustumSize = 69;
 
-var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
@@ -14,30 +13,33 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 container.appendChild(renderer.domElement);
 
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
-var clock = new THREE.Clock();
-var light = new THREE.DirectionalLight(0xffffff, 0.5);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const clock = new THREE.Clock();
+const light = new THREE.DirectionalLight(0xffffff, 0.5);
 light.position.setScalar(10);
 scene.add(light);
 scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
 const axesColor = 0x5ca4a9;
-var color = 0xd69dff;
+const color = 0xd69dff;
 const length = 10;
-var func = new Function('return new Complex()');
+let multiplier = 10;
+let isModArg = false;
 
-var resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
-var graph = new THREE.Object3D();
+let resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
+let graph = new THREE.Object3D();
 scene.add(graph);
 
-init();
+load();
 render();
+onWindowResize();
+window.addEventListener('resize', onWindowResize);
 
 function makeLine(geo, color, lineWidth = 10, opacity = 1) {
-    var g = new MeshLine();
+    const g = new MeshLine();
     g.setGeometry(geo);
 
-    var material = new MeshLineMaterial({
+    const material = new MeshLineMaterial({
         useMap: false,
         color: color,
         opacity: opacity,
@@ -45,17 +47,13 @@ function makeLine(geo, color, lineWidth = 10, opacity = 1) {
         sizeAttenuation: false,
         lineWidth: lineWidth
     });
-    var mesh = new THREE.Mesh(g.geometry, material);
+    const mesh = new THREE.Mesh(g.geometry, material);
     graph.add(mesh);
 }
 
-function init() {
-    load();
-}
-
 function createGrid() {
-    for (var i = -length; i <= length; i++) {
-        var line = new THREE.Geometry();
+    for (let i = -length; i <= length; i++) {
+        let line = new THREE.Geometry();
 
         let width = 5;
         if (i == 0) width = 20;
@@ -64,7 +62,7 @@ function createGrid() {
         line.vertices.push(new THREE.Vector3(i, 0, length));
         makeLine(line, axesColor, width);
 
-        var line = new THREE.Geometry();
+        line = new THREE.Geometry();
         line.vertices.push(new THREE.Vector3(-length, 0, i));
         line.vertices.push(new THREE.Vector3(length, 0, i));
         makeLine(line, axesColor, width);
@@ -73,7 +71,6 @@ function createGrid() {
 function createMesh() {
     var width = 2 * length; // 20
     var height = width;
-    var multiplier = 10;
     var segments = multiplier * width;
     var plane = new THREE.PlaneBufferGeometry(width, height, segments, segments);
 
@@ -85,17 +82,21 @@ function createMesh() {
         re /= multiplier;
         let input = new Complex(re, im);
         let output = func(input);
-        plane.attributes.position.setZ(i, output.re);
-        let arg = output.arg() / Math.PI / 2;
-        if (arg < 0) arg += 1;
-        let color = HSVtoRGB(arg, 0.6, 1);
-        // console.log('%ccolor', `background:rgb(${color.r},${color.g},${color.b})`);
-        // colors.push(color.r / 255);
-        // colors.push(color.g / 255);
-        // colors.push(color.b / 255);
-        colors.push(sig(im));
-        colors.push(sig(im));
-        colors.push(sig(im));
+        if (!isModArg) {
+            plane.attributes.position.setZ(i, output.re);
+            let sigmoid_im = sig(im);
+            colors.push(sigmoid_im);
+            colors.push(sigmoid_im);
+            colors.push(sigmoid_im);
+        } else {
+            plane.attributes.position.setZ(i, output.abs());
+            let arg = output.arg() / Math.PI / 2;
+            if (arg < 0) arg += 1;
+            let color = HSVtoRGB(arg, 0.6, 1);
+            colors.push(color.r / 255);
+            colors.push(color.g / 255);
+            colors.push(color.b / 255);
+        }
     }
 
     plane.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
@@ -155,16 +156,17 @@ function fn(input) {
     return func(input);
 }
 function load() {
-    var inputBox = document.getElementById('fn');
-    var errPara = document.getElementById('err');
-
+    let inputBox = document.getElementById('fn');
+    let errPara = document.getElementById('err');
+    let checkBox = document.getElementById('checkbox');
+    isModArg = checkBox.checked;
     try {
         func = Function('input', inputBox.value);
         errPara.innerText = '';
         clear();
+        createText();
         createGrid();
         createMesh();
-        createText();
     } catch (e) {
         func = Function('return new Complex()');
     }
@@ -173,7 +175,6 @@ function throwInvalidJS() {
     var errPara = document.getElementById('err');
     errPara.innerText = 'Invalid JS';
 }
-onWindowResize();
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -182,14 +183,13 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-window.addEventListener('resize', onWindowResize);
-
 function render() {
     requestAnimationFrame(render);
     controls.update();
-    graph.rotation.y += 0.1 * clock.getDelta();
+    graph.rotation.y += 0.05 * clock.getDelta();
     renderer.render(scene, camera);
 }
+
 function HSVtoRGB(h, s, v) {
     var r, g, b, i, f, p, q, t;
     if (arguments.length === 1) {
@@ -230,6 +230,7 @@ function HSVtoRGB(h, s, v) {
 function sig(x) {
     return 1 / (1 + Math.pow(Math.E, -x));
 }
+
 function clear() {
     for (var i = graph.children.length - 1; i >= 0; i--) {
         graph.remove(graph.children[i]);

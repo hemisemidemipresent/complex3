@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/switch.css">
+
 </head>
 
 <body>
@@ -26,7 +28,16 @@
             <textarea id="fn" type="text">return input.pow(3).div(100).add(new Complex(1,1))</textarea>
         </p>
         <p id="err"></p>
+        <div id="conv">
+            <p>Re-Im</p>
+            <label class="switch">
+                <input type="checkbox" id="checkbox">
+                <span class="slider round"></span>
+            </label>
+            <p>Mod-Arg</p>
+        </div>
 
+        <br>
         <button onclick="load()">Load</button>
         <br>
         <a href="https://github.com/hemisemidemipresent/complex3">github</a>
@@ -39,11 +50,12 @@
 
     </div>
 </body>
-<script src="js/three/three.js"></script>
+<script src="js/three/three.min.js"></script>
 <script src="js/three/OrbitControls.js"></script>
 <script src="js/three/THREE.MeshLine.js"></script>
 
-<script src="js/complex/complex.js"></script>
+<script src="js/complex/complex.min.js"></script>
 <script src="js/index.js"></script>
+<script src="js/graph.js"></script>
 
 </html>
