@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>s
+    <div id="container"></div>
+    <div id="title">
+        <p>
+            grid = input plane of complex numbers (ℂ)<br>height of surface = real part<br>color of surface -
+            white = bigger Im, black = smaller Im
+            <br>
+            This website uses <a href="https://github.com/infusion/Complex.js">Complex.js
+            </a>
+            <br>
+            To input a function, simply manipulate the <code>input</code> variable using javascript
+            <br>
+            and return the value as if you are writing a function (because you are)
+            <br>
+            <input id="fn" type="text" value="return input.pow(3).div(100).add(new Complex(1,1))">
+        </p>
+        <p id="err"></p>
+
+        <button onclick="load()">Load</button>
+        <br>
+        <a href="https://github.com/hemisemidemipresent/complex3">github</a>
+        <br>
+        <a href="https://hemisemidemipresent.github.io/complex2/">previous
+            attempt at graphing</a>
+        <br>
+        <a href="https://hemisemidemipresent.github.io/complex/">previous previous
+            attempt at graphing</a>
+
+    </div>
+</body>
+<script src="js/three/three.js"></script>
+<script src="js/three/OrbitControls.js"></script>
+<script src="js/three/THREE.MeshLine.js"></script>
+
+<script src="js/complex/complex.js"></script>
+<script src="js/goodgpu.js"></script>
+
+</html>
