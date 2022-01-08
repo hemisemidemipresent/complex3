@@ -32,14 +32,12 @@
             <p>f(z) = </p><textarea id="fn" type="text">z^3/100+1+i</textarea>
         </div>
         <p id="err"></p>
-        <div id="conv">
-            <p>Re-Im</p>
-            <label class="switch">
-                <input type="checkbox" id="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <p id="Mod-Arg">Mod-Arg (you need to press "Load" to change)</p>
-        </div>
+        <p>Select plot:</p>
+        <select name="plot" id="plotChooser">
+            <option value="Re-Im">Re-Im</option>
+            <option value="Im-Re">Im-Re</option>
+            <option value="Mod-Arg">Mod-Arg</option>
+        </select>
         <div id='gpu'>
             <label for="gpuLevel">How good is your GPU/How accurate do you want the graph on a scale: <br> from 1 (bad)
                 to *insert big
@@ -50,6 +48,7 @@
         </div>
         <button onclick="load()" class="btn">Load</button>
         <button onclick="toggleRot()" class="btn">Toggle rotation</button>
+        <button onclick="toggleShiny()" class="btn">Toggle shine</button>
 
         <br>
         <a id="gh" href="https://github.com/hemisemidemipresent/complex3">Github</a>
@@ -57,6 +56,7 @@
     <div id="book">
         <button class="icon" onclick="toggleBook() "><i class="fas fa-book fa-2x"></i></button>
         <button class="icon" onclick="exportImg()"><i class="fas fa-camera fa-2x"></i></button>
+
     </div>
 </body>
 <script src="js/three/three.min.js"></script>

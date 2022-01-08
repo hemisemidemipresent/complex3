@@ -1,7 +1,7 @@
 const container = document.getElementById('container');
 const inputBox = document.getElementById('fn');
 const errPara = document.getElementById('err');
-const checkBox = document.getElementById('checkbox');
+const plotChooser = document.getElementById('plotChooser');
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -20,17 +20,17 @@ container.appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 const clock = new THREE.Clock();
-// const light = new THREE.DirectionalLight(0xffffff, 0.5);
-// light.position.setScalar(10);
-// scene.add(light);
-scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+const light = new THREE.DirectionalLight(0xffffff, 0.75);
+light.position.setScalar(10);
+scene.add(light);
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
 const axesColor = 0x5ca4a9;
 const color = 0xd69dff;
 const length = 10;
 let multiplier = document.getElementById('gpuLevel').value;
-let isModArg = false;
 let isRotate = true;
+let isShiny = false;
 
 let resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
 let graph = new THREE.Object3D();
@@ -97,12 +97,18 @@ async function createMesh() {
         let output = func({ z: input });
 
         let legend = document.getElementById('legend');
-        if (!isModArg) {
+        if (plot == 'Re-Im') {
             plane.attributes.position.setZ(i, output.re);
-            let sigmoid_im = sig(im);
+            let sigmoid_im = sig(output.im);
             colors.push(sigmoid_im, sigmoid_im, sigmoid_im);
             legend.innerHTML =
-                'height of surface = real part of output<br>color of surface - white = bigger Im, black = smaller Im';
+                'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), black = smaller Im(f(z))';
+        } else if (plot == 'Im-Re') {
+            plane.attributes.position.setZ(i, output.im);
+            let sigmoid_re = sig(output.re);
+            colors.push(sigmoid_re, sigmoid_re, sigmoid_re);
+            legend.innerHTML =
+                'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
         } else {
             plane.attributes.position.setZ(i, output.abs());
             let arg = output.arg() / Math.PI / 2;
@@ -119,13 +125,24 @@ async function createMesh() {
     plane.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
     plane.computeVertexNormals();
-    let mesh = new THREE.Mesh(
-        plane,
-        new THREE.MeshLambertMaterial({
-            vertexColors: THREE.VertexColors,
-            side: THREE.DoubleSide
-        })
-    );
+    let mesh;
+    if (isShiny)
+        mesh = new THREE.Mesh(
+            plane,
+            new THREE.MeshPhongMaterial({
+                vertexColors: THREE.VertexColors,
+                side: THREE.DoubleSide,
+                specular: '#333333'
+            })
+        );
+    else
+        mesh = new THREE.Mesh(
+            plane,
+            new THREE.MeshLambertMaterial({
+                vertexColors: THREE.VertexColors,
+                side: THREE.DoubleSide
+            })
+        );
     mesh.rotation.x = -Math.PI / 2;
     mesh.name = 'mesh';
     return mesh;
@@ -174,8 +191,7 @@ function createText() {
 
 async function load() {
     multiplier = document.getElementById('gpuLevel').value;
-
-    isModArg = checkBox.checked;
+    plot = plotChooser.value;
     try {
         func = math.parse(inputBox.value).compile().evaluate;
         errPara.innerText = '';
@@ -272,4 +288,9 @@ function exportImg() {
 
 function toggleRot() {
     isRotate = !isRotate;
+}
+
+function toggleShiny() {
+    isShiny = !isShiny;
+    load();
 }

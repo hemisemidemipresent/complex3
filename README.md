@@ -1,6 +1,6 @@
 # complex3
 
-A 3D web-based complex function grapher
+[A 3D web-based complex function grapher](https://hemisemidemipresent.github.io/complex3/)
 
 Uses [math.js](https://mathjs.org/) and [three.js](https://threejs.org/)
 

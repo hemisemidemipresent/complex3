@@ -12,7 +12,7 @@ body {
 	color: #ffffff;
 	padding: 20px;
 }
-body #gpu,#gh,p:not(#Mod-Arg) {
+body #gpu,#gh,#plotChooser,p:not(#Mod-Arg) {
 	margin: 0 0 0 1em;
 }
 body p{
