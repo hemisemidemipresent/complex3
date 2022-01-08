@@ -1,8 +1,8 @@
 # complex3
 
-A web-based complex function grapher
+A 3D web-based complex function grapher
 
-Uses complex.js and three.js
+Uses [math.js](https://mathjs.org/) and [three.js](https://threejs.org/)
 
 ## TODO
 
