@@ -12,6 +12,12 @@ body {
 	color: #ffffff;
 	padding: 20px;
 }
+body #gpu,#gh,p:not(#Mod-Arg) {
+	margin: 0 0 0 1em;
+}
+body p{
+	margin:0.5em
+}
 #container {
 	position: absolute;
 	left: 0;
@@ -38,6 +44,7 @@ textarea{
 	font-family: 'Courier New', Courier, monospace;
 	width:33em;	
 	height: 2em;
+	padding:0.5em;
 	border:1px solid grey;
 	margin:1em;
 	background: rgba(36,36,36,0.69);
@@ -67,10 +74,10 @@ textarea{
 		width:90vw;
 	}
 }
-#loadBtn{
+.btn{
 	border:1px solid white;
 	padding: 0.5em 1em 0.5em 1em;
-	margin: 0 0 1em 1em;
+	margin: 1em 0 1em 1em;
 	border-radius: 0.75em;
 	background: none;
 	color:white;

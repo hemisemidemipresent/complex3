@@ -1,29 +1,34 @@
 const container = document.getElementById('container');
+const inputBox = document.getElementById('fn');
+const errPara = document.getElementById('err');
+const checkBox = document.getElementById('checkbox');
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(25, 2.5, 25);
 const frustumSize = 69;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,
+    preserveDrawingBuffer: true
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 container.appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 const clock = new THREE.Clock();
-const light = new THREE.DirectionalLight(0xffffff, 0.5);
-light.position.setScalar(10);
-scene.add(light);
-scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+// const light = new THREE.DirectionalLight(0xffffff, 0.5);
+// light.position.setScalar(10);
+// scene.add(light);
+scene.add(new THREE.AmbientLight(0xffffff, 0.75));
 
 const axesColor = 0x5ca4a9;
 const color = 0xd69dff;
 const length = 10;
-let multiplier = 10;
+let multiplier = document.getElementById('gpuLevel').value;
 let isModArg = false;
 let isRotate = true;
 
@@ -38,7 +43,9 @@ load();
 render();
 onWindowResize();
 window.addEventListener('resize', onWindowResize);
-
+let f = 'z^2';
+let j = math.parse(f).compile().evaluate;
+let out = j({ z: math.complex(1, 1) });
 function makeLine(geo, color, lineWidth = 10, opacity = 1) {
     const g = new MeshLine();
     g.setGeometry(geo);
@@ -74,7 +81,7 @@ function createGrid() {
     graph.add(grid);
 }
 
-function createMesh() {
+async function createMesh() {
     let width = 2 * length; // 20
     let height = width;
     let segments = multiplier * width;
@@ -86,8 +93,8 @@ function createMesh() {
         im /= multiplier;
         let re = (i - (i % (segments + 1))) / (segments + 1) - segments / 2;
         re /= multiplier;
-        let input = new Complex(re, im);
-        let output = func(input);
+        let input = math.complex(re, im);
+        let output = func({ z: input });
 
         let legend = document.getElementById('legend');
         if (!isModArg) {
@@ -121,7 +128,7 @@ function createMesh() {
     );
     mesh.rotation.x = -Math.PI / 2;
     mesh.name = 'mesh';
-    graph.add(mesh);
+    return mesh;
 }
 
 function createText() {
@@ -165,18 +172,18 @@ function createText() {
     });
 }
 
-function load() {
-    let inputBox = document.getElementById('fn');
-    let errPara = document.getElementById('err');
-    let checkBox = document.getElementById('checkbox');
+async function load() {
+    multiplier = document.getElementById('gpuLevel').value;
+
     isModArg = checkBox.checked;
     try {
-        func = Function('input', inputBox.value);
+        func = math.parse(inputBox.value).compile().evaluate;
         errPara.innerText = '';
+        let mesh = await createMesh();
         clearMesh();
-        createMesh();
+        graph.add(mesh);
     } catch (e) {
-        func = Function('return new Complex()');
+        func = math.parse('z').compile().evaluate;
         console.log(e);
     }
 }
@@ -197,7 +204,8 @@ function render() {
     requestAnimationFrame(render);
     controls.update();
     if (isRotate) {
-        graph.rotation.y += 0.05 * clock.getDelta();
+        // graph.rotation.y += 0.05 * clock.getDelta();
+        graph.rotation.y += 0.001;
     }
     renderer.render(scene, camera);
 }
@@ -247,4 +255,21 @@ function clearMesh() {
     for (let i = 0; i < graph.children.length; i++) {
         if (graph.children[i].name == 'mesh') graph.remove(graph.children[i]);
     }
+}
+
+function exportImg() {
+    let imgData = document.getElementsByTagName('canvas')[0].toDataURL('image/png');
+    var element = document.createElement('a');
+    element.setAttribute(
+        'href',
+        imgData.replace(/^data:image\/[^;]/, 'data:application/octet-stream')
+    );
+    element.setAttribute('download', 'graph.png');
+    element.style.display = 'none';
+
+    element.click();
+}
+
+function toggleRot() {
+    isRotate = !isRotate;
 }

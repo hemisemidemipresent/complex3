@@ -11,6 +11,8 @@
     <title>Complex Function Grapher</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/switch.css">
+    <link rel="stylesheet" href="css/book.css">
+    <script defer src="https://kit.fontawesome.com/59d09dda3d.js" crossorigin="anonymous"></script>
 
 </head>
 
@@ -21,16 +23,14 @@
             grid = input plane of complex numbers (ℂ)<br>
         <p id='legend'>height of surface = real part<br>color of surface -
             white = bigger Im, black = smaller Im</p>
-        <br>
-        This website uses <a href="https://github.com/infusion/Complex.js">Complex.js
-        </a>
-        <br>
-        To input a function, simply manipulate the <code>input</code> variable using javascript
-        <br>
-        and return the value as if you are writing a function (because you are)
-        <br>
-        <textarea id="fn" type="text">return input.pow(3).div(100).add(new Complex(1,1))</textarea>
+
+        <p> This website uses <a href="https://mathjs.org/">Math.js
+            </a></p>
+
         </p>
+        <div id="conv">
+            <p>f(z) = </p><textarea id="fn" type="text">z^3/100+1+i</textarea>
+        </div>
         <p id="err"></p>
         <div id="conv">
             <p>Re-Im</p>
@@ -38,28 +38,33 @@
                 <input type="checkbox" id="checkbox">
                 <span class="slider round"></span>
             </label>
-            <p>Mod-Arg (you need to press "Load" to change)</p>
+            <p id="Mod-Arg">Mod-Arg (you need to press "Load" to change)</p>
         </div>
+        <div id='gpu'>
+            <label for="gpuLevel">How good is your GPU/How accurate do you want the graph on a scale: <br> from 1 (bad)
+                to *insert big
+                number*
+                (NASA):</label>
+
+            <input type="number" id="gpuLevel" name="gpuLevel" min="1" max="99999999999" value="1">
+        </div>
+        <button onclick="load()" class="btn">Load</button>
+        <button onclick="toggleRot()" class="btn">Toggle rotation</button>
 
         <br>
-        <button onclick="load()" id="loadBtn">Load</button>
-        <br>
-        <a href="https://github.com/hemisemidemipresent/complex3">github</a>
-        <br>
-        <a href="https://hemisemidemipresent.github.io/complex2/">previous
-            attempt at graphing</a>
-        <br>
-        <a href="https://hemisemidemipresent.github.io/complex/">previous previous
-            attempt at graphing</a>
-
+        <a id="gh" href="https://github.com/hemisemidemipresent/complex3">github</a>
+    </div>
+    <div id="book">
+        <button class="icon" onclick="toggleBook() "><i class="fas fa-book fa-2x"></i></button>
+        <button class="icon" onclick="exportImg()"><i class="fas fa-camera fa-2x"></i></button>
     </div>
 </body>
 <script src="js/three/three.min.js"></script>
 <script src="js/three/OrbitControls.js"></script>
 <script src="js/three/THREE.MeshLine.js"></script>
+<script src="js/math/math.min.js"></script>
 
-<script src="js/complex/complex.min.js"></script>
 <script src="js/index.js"></script>
-<script src="js/graph.js"></script>
+<script src="js/GUI.js"></script>
 
 </html>
