@@ -1,84 +1,93 @@
 * {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 body {
-	overflow: hidden;
-	font-family: "Computer Modern", Lato, sans-serif;
-	width: 100%;
-	height: 100%;
-	background-color: #333333;
-	color: #ffffff;
-	padding: 20px;
+    overflow: hidden;
+    font-family: 'Computer Modern', Lato, sans-serif;
+    width: 100%;
+    height: 100%;
+    background-color: #333333;
+    color: #ffffff;
+    padding: 20px;
 }
-body #gpu,#gh,#plotChooser,p:not(#Mod-Arg) {
-	margin: 0 0 0 1em;
+body #gpu,
+#gh,
+#plotChooser,
+p:not(#Mod-Arg) {
+    margin: 0 0 0 1em;
 }
-body p{
-	margin:0.5em
+body p {
+    margin: 0.5em;
 }
 #container {
-	position: absolute;
-	left: 0;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
-	height: 100%;
-	border: 1px solid transparent;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid transparent;
 }
 #title {
-	position: absolute;
-	left: 20px;
-	top: 20px;
-	background: rgba(36,36,36,0.69);
-	color:white;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    background: rgba(36, 36, 36, 0.69);
+    color: white;
 }
-a{
-	text-decoration: none;
-	color:aquamarine;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+a {
+    text-decoration: none;
+    color: aquamarine;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
-textarea{
-	font-family: 'Courier New', Courier, monospace;
-	width:33em;	
-	height: 2em;
-	padding:0.5em;
-	border:1px solid grey;
-	margin:1em;
-	background: rgba(36,36,36,0.69);
-	color:white;
+textarea {
+    font-family: 'Courier New', Courier, monospace;
+    width: 33em;
+    height: 2em;
+    padding: 0.5em;
+    border: 1px solid grey;
+    margin: 1em;
+    background: rgba(36, 36, 36, 0.69);
+    color: white;
 }
-#err{
-	color:#ff4444;
-	text-shadow: none;
-	font-weight: bold;
+#err {
+    color: #ff4444;
+    text-shadow: none;
+    font-weight: bold;
 }
 @font-face {
-    font-family: "Computer Modern";
+    font-family: 'Computer Modern';
     src: url('../fonts/cmunss.otf');
 }
 @media only screen and (max-width: 600px) {
-	#title {
-		position: absolute;
-		left: 5px;
-		top: 5px;
-		background: rgba(36,36,36,0.69);
-		padding: 0.5em;
-		width:100vw;
-		height:25vh;
-		font-size: smaller;
-	}
-	textarea{
-		width:90vw;
-	}
+    #title {
+        position: absolute;
+        left: 5px;
+        top: 5px;
+        background: rgba(36, 36, 36, 0.69);
+        padding: 0.5em;
+        width: 100vw;
+        height: 25vh;
+    }
+    textarea {
+        width: 60vw;
+    }
+    button,
+    textarea,
+    #title,
+    select,
+    input {
+        font-size: 8px;
+    }
 }
-.btn{
-	border:1px solid white;
-	padding: 0.5em 1em 0.5em 1em;
-	margin: 1em 0 1em 1em;
-	border-radius: 0.75em;
-	background: none;
-	color:white;
+.btn {
+    border: 1px solid white;
+    padding: 0.5em 1em 0.5em 1em;
+    margin: 1em 0 1em 1em;
+    border-radius: 0.75em;
+    background: none;
+    color: white;
 }

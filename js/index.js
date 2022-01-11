@@ -8,17 +8,20 @@ const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerH
 camera.position.set(25, 2.5, 25);
 const frustumSize = 69;
 
-const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: true,
-    preserveDrawingBuffer: true
-});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
+let renderer, controls;
+initRenderer();
+function initRenderer() {
+    renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: false
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+}
 
-container.appendChild(renderer.domElement);
-
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
 const clock = new THREE.Clock();
 const light = new THREE.DirectionalLight(0xffffff, 0.75);
 light.position.setScalar(10);
@@ -95,6 +98,13 @@ async function createMesh() {
         re /= multiplier;
         let input = math.complex(re, im);
         let output = func({ z: input });
+        // infinity handling
+        let basicallyInfinity = 1e9;
+        if (output == Infinity) output = math.complex(Infinity, Infinity);
+        if (output.re == Infinity) output.re = basicallyInfinity;
+        if (output.im == Infinity) output.im = basicallyInfinity;
+        // idk why this happens
+        if (typeof output == 'number') output = math.complex(output, 0);
 
         let legend = document.getElementById('legend');
         if (plot == 'Re-Im') {
@@ -110,7 +120,11 @@ async function createMesh() {
             legend.innerHTML =
                 'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
         } else {
-            plane.attributes.position.setZ(i, output.abs());
+            try {
+                plane.attributes.position.setZ(i, output.abs());
+            } catch (e) {
+                console.log(output);
+            }
             let arg = output.arg() / Math.PI / 2;
             if (arg < 0) arg += 1;
             let color = HSVtoRGB(arg, 0.6, 1);
@@ -274,6 +288,23 @@ function clearMesh() {
 }
 
 function exportImg() {
+    // replace renderer
+    renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    // remove previous canvas
+    container.innerHTML = '';
+    // add preserveDrawingBuffer canvas
+    container.appendChild(renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    load();
+    render();
+    // image stuff
     let imgData = document.getElementsByTagName('canvas')[0].toDataURL('image/png');
     var element = document.createElement('a');
     element.setAttribute(
@@ -284,6 +315,11 @@ function exportImg() {
     element.style.display = 'none';
 
     element.click();
+    document.removeChild(element);
+    // remove preserveDrawingBuffer canvas
+
+    container.innerHTML = '';
+    initRenderer();
 }
 
 function toggleRot() {

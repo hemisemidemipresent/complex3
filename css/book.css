@@ -1,31 +1,27 @@
 #book {
-	position: absolute;
-	left: 0.25em;
-	bottom: 0.25em;
-	display: flex;
-	flex-direction: row;
+    position: absolute;
+    left: 0.25em;
+    bottom: 0.25em;
+    display: flex;
+    flex-direction: row;
 }
-.icon{
-	background-color: transparent;
-	border: none;
-	background: rgba(36,36,36,0.69);
-	width: 5em;
-	height:5em;
-	margin: 0.25em;
+.icon {
+    background-color: transparent;
+    border: none;
+    background: rgba(36, 36, 36, 0.69);
+    width: 5em;
+    height: 5em;
+    margin: 0.25em;
 }
-.icon i{
-	color:white;
+.icon i {
+    color: white;
 }
 @media only screen and (max-width: 600px) {
-	#book {
-		position: absolute;
-		left: 5px;
-		bottom: 5px;
-		padding: 0.5em;
-		flex-direction: column;
-
-	}
-	textarea{
-		width:90vw;
-	}
+    #book {
+        position: absolute;
+        left: 5px;
+        bottom: 5px;
+        padding: 0.5em;
+        flex-direction: column;
+    }
 }
