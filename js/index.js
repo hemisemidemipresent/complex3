@@ -2,11 +2,13 @@ const container = document.getElementById('container');
 const inputBox = document.getElementById('fn');
 const errPara = document.getElementById('err');
 const plotChooser = document.getElementById('plotChooser');
+const rotBtn = document.getElementById('rotBtn');
+const shineBtn = document.getElementById('shineBtn');
+const bwBtn = document.getElementById('bwBtn');
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(25, 2.5, 25);
-const frustumSize = 69;
 
 let renderer, controls;
 initRenderer();
@@ -34,6 +36,7 @@ const length = 10;
 let multiplier = document.getElementById('gpuLevel').value;
 let isRotate = true;
 let isShiny = false;
+let isBW = true;
 
 let resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
 let graph = new THREE.Object3D();
@@ -110,16 +113,31 @@ async function createMesh() {
         if (plot == 'Re-Im') {
             plane.attributes.position.setZ(i, output.re);
             let sigmoid_im = sig(output.im);
-            colors.push(sigmoid_im, sigmoid_im, sigmoid_im);
-            legend.innerHTML =
-                'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), black = smaller Im(f(z))';
+            if (isBW) {
+                colors.push(sigmoid_im, sigmoid_im, sigmoid_im);
+                legend.innerHTML =
+                    'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), light cyan = 0, black = smaller Im(f(z))';
+            } else {
+                let color = HSVtoRGB(sigmoid_im, 0.6, 1);
+                colors.push(color.r / 255, color.g / 255, color.b / 255);
+                legend.innerHTML =
+                    'height of surface = Re(f(z))<br>color of surface - magenta = bigger Im(f(z)), light cyan = 0, red = smaller Im(f(z))';
+            }
         } else if (plot == 'Im-Re') {
             plane.attributes.position.setZ(i, output.im);
             let sigmoid_re = sig(output.re);
-            colors.push(sigmoid_re, sigmoid_re, sigmoid_re);
-            legend.innerHTML =
-                'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
+            if (isBW) {
+                let color = HSVtoRGB(sigmoid_re, 0.6, 1);
+                colors.push(color.r / 255, color.g / 255, color.b / 255);
+                legend.innerHTML =
+                    'height of surface = Im(f(z))<br>color of surface - magenta = bigger Re(f(z)), red = smaller Re(f(z))';
+            } else {
+                colors.push(sigmoid_re, sigmoid_re, sigmoid_re);
+                legend.innerHTML =
+                    'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
+            }
         } else {
+            if (isBW) toggleBW();
             try {
                 plane.attributes.position.setZ(i, output.abs());
             } catch (e) {
@@ -128,9 +146,7 @@ async function createMesh() {
             let arg = output.arg() / Math.PI / 2;
             if (arg < 0) arg += 1;
             let color = HSVtoRGB(arg, 0.6, 1);
-            colors.push(color.r / 255);
-            colors.push(color.g / 255);
-            colors.push(color.b / 255);
+            colors.push(color.r / 255, color.g / 255, color.b / 255);
             legend.innerHTML =
                 'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
         }
@@ -323,10 +339,21 @@ function exportImg() {
 }
 
 function toggleRot() {
+    if (isRotate) rotBtn.innerText = 'Rotate Off';
+    else rotBtn.innerText = 'Rotate On';
     isRotate = !isRotate;
 }
 
 function toggleShiny() {
+    if (isShiny) shineBtn.innerText = 'Shine Off';
+    else shineBtn.innerText = 'Shine On';
     isShiny = !isShiny;
+    load();
+}
+function toggleBW() {
+    if (isBW) bwBtn.innerText = 'Switch to B/W';
+    else bwBtn.innerText = 'Switch to color';
+
+    isBW = !isBW;
     load();
 }

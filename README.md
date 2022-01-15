@@ -7,6 +7,7 @@ Uses [math.js](https://mathjs.org/) and [three.js](https://threejs.org/)
 ## TODO
 
 -   [ ] Logarithmic height option
+-   [ ] cut off after certain height option
 -   [ ] Export to a `.stl` file 3D printing (probably defer [this](https://github.com/eligrey/FileSaver.js/) or smth)
 
 ### Done

@@ -40,16 +40,14 @@
         </select>
         <div id='gpu'>
             <label for="gpuLevel">How good is your device/How accurate do you want the graph on a scale: <br> from 1
-                (bad)
-                to *insert big
-                number*
-                (NASA):</label>
+                (bad) to 99999999999 (NASA):</label>
 
             <input type="number" id="gpuLevel" name="gpuLevel" min="1" max="99999999999" value="1">
         </div>
         <button onclick="load()" class="btn">Load</button>
-        <button onclick="toggleRot()" class="btn">Toggle rotation</button>
-        <button onclick="toggleShiny()" class="btn">Toggle shine</button>
+        <button onclick="toggleRot()" class="btn" id="rotBtn">Rotate On</button>
+        <button onclick="toggleShiny()" class="btn" id="shineBtn">Shine Off</button>
+        <button onclick="toggleBW()" class="btn" id="bwBtn">Switch to color</button>
 
         <br>
         <a id="gh" href="https://github.com/hemisemidemipresent/complex3">Github</a>
