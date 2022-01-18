@@ -66,7 +66,7 @@ I saw cool stuff like this graph from [this youtube video](https://www.youtube.c
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932950259175424020/unknown.png?width=600&height=317)
 
-but there is no easy way to render such Mod-Arg plots. So the objective of this is to create an optimized way to graph 3D complex plots **on the web**.
+but there is no easy way to render such Mod-Arg plots. So the objective of this is to create an optimized way to graph 3D complex plots **on the web** (snappily).
 
 ## TODO
 
@@ -115,3 +115,11 @@ note: for functions with asymptotes/large changes in gradient it is necessary to
 ![](https://media.discordapp.net/attachments/699781597515481159/932972496720904252/unknown.png?width=600&height=300)
 
 > sinh(z), Mod-Arg
+
+![](https://media.discordapp.net/attachments/699781597515481159/932975183021637662/unknown.png?width=600&height=300)
+
+> 4asin(z/4), Re-Im
+
+![](https://media.discordapp.net/attachments/699781597515481159/932975915703627796/unknown.png?width=600&height=300)
+
+> 1/(1+(z/5)^2), Re-Im, colored, you can see the 2 asymptotes at z=±i that causes the radius of convergence to be 1
