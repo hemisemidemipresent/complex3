@@ -6,6 +6,8 @@ const rotBtn = document.getElementById('rotBtn');
 const shineBtn = document.getElementById('shineBtn');
 const bwBtn = document.getElementById('bwBtn');
 
+const saturation = 0.75;
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(25, 2.5, 25);
@@ -118,7 +120,7 @@ async function createMesh() {
                 legend.innerHTML =
                     'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), light cyan = 0, black = smaller Im(f(z))';
             } else {
-                let color = HSVtoRGB(sigmoid_im, 0.6, 1);
+                let color = HSVtoRGB(sigmoid_im, saturation, 1);
                 colors.push(color.r / 255, color.g / 255, color.b / 255);
                 legend.innerHTML =
                     'height of surface = Re(f(z))<br>color of surface - magenta = bigger Im(f(z)), light cyan = 0, red = smaller Im(f(z))';
@@ -127,7 +129,7 @@ async function createMesh() {
             plane.attributes.position.setZ(i, output.im);
             let sigmoid_re = sig(output.re);
             if (isBW) {
-                let color = HSVtoRGB(sigmoid_re, 0.6, 1);
+                let color = HSVtoRGB(sigmoid_re, saturation, 1);
                 colors.push(color.r / 255, color.g / 255, color.b / 255);
                 legend.innerHTML =
                     'height of surface = Im(f(z))<br>color of surface - magenta = bigger Re(f(z)), red = smaller Re(f(z))';
@@ -145,7 +147,7 @@ async function createMesh() {
             }
             let arg = output.arg() / Math.PI / 2;
             if (arg < 0) arg += 1;
-            let color = HSVtoRGB(arg, 0.6, 1);
+            let color = HSVtoRGB(arg, saturation, 1);
             colors.push(color.r / 255, color.g / 255, color.b / 255);
             legend.innerHTML =
                 'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
@@ -162,7 +164,9 @@ async function createMesh() {
             new THREE.MeshPhongMaterial({
                 vertexColors: THREE.VertexColors,
                 side: THREE.DoubleSide,
-                specular: '#333333'
+                specular: '#333333',
+                transparent: true,
+                opacity: 0.7
             })
         );
     else
