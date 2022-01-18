@@ -48,6 +48,10 @@ Uses [Math.js](https://mathjs.org/) for expression parsing and evaluation and [t
 
     > Note: This might not accurately represent how real life translucent shiny surfaces work, and there may be issues on devices with less great GPUs
 
+-   ### If you dont like B/W with Re-Im/Im-Re plots
+
+    ![](https://media.discordapp.net/attachments/699781597515481159/932971032665554944/unknown.png)
+
 -   ### Lower Left Buttons
 
     ![](https://media.discordapp.net/attachments/699781597515481159/932963119192481822/unknown.png)
@@ -55,6 +59,14 @@ Uses [Math.js](https://mathjs.org/) for expression parsing and evaluation and [t
     the book icon hides/shows the topleft tab
 
     the camera icon **exports the graph as a .png**
+
+## Purpose
+
+I saw cool stuff like this graph from [this youtube video](https://www.youtube.com/watch?v=3qEJeP6qQGA):
+
+![](https://media.discordapp.net/attachments/699781597515481159/932950259175424020/unknown.png?width=600&height=317)
+
+but there is no easy way to render such Mod-Arg plots. So the objective of this is to create an optimized way to graph 3D complex plots **on the web**.
 
 ## TODO
 
@@ -72,10 +84,34 @@ Uses [Math.js](https://mathjs.org/) for expression parsing and evaluation and [t
 -   [x] Optimize reloading
 -   [x] shiny/glassy surface option
 
-## History
+## What are Re-Im/Im-Re/Mod-Arg plots?
 
-I saw cool stuff like this graph from [this youtube video](https://www.youtube.com/watch?v=3qEJeP6qQGA):
+for a complex-valued function, the complex input consists of 2 values (Real and Imaginary part i.e. `x+iy`) while the complex output similarly also consists of 2 values. This would require a 4-dimensional graph that we cannot visualize, however, so instead, we plot 3 values and leave the 4th one to color
 
-![](https://media.discordapp.net/attachments/699781597515481159/932950259175424020/unknown.png?width=600&height=317)
+for example for the given function f(x+iy) = w+iv
 
-but there is no easy way to render such Mod-Arg plots. So the objective of this is to create an optimized way to graph 3D complex plots **on the web**.
+-   a Re-Im plot takes the real component of the output `w` and uses that as the height of the surface at a given point. the imaginary part `v` is sigmoid-ed to B/W value
+-   a Im-Re plot, on the other hand takes the imaginary component of the output `v` and uses that as the height of the surface at a given point. the real part `w` is sigmoid-ed to B/W value
+-   a Mod-Arg plot takes the **modulus** as the height and the **argument**:
+
+![](https://media.discordapp.net/attachments/699781597515481159/932965860870586478/unknown.png)
+
+## examples
+
+note: for functions with asymptotes/large changes in gradient it is necessary to increase the "How good is your device" to a value higher, perhaps 10 but 25 is better
+
+![](https://media.discordapp.net/attachments/699781597515481159/932969004719562772/unknown.png?width=600&height=300)
+
+> tan(z), Mod-Arg
+
+![](https://media.discordapp.net/attachments/699781597515481159/932970020332527616/unknown.png?width=600&height=300)
+
+> gamma(z), Mod-Arg
+
+![](https://media.discordapp.net/attachments/699781597515481159/932970810426163231/unknown.png?width=600&height=300)
+
+> sec(z), Re-Im, colored
+
+![](https://media.discordapp.net/attachments/699781597515481159/932972496720904252/unknown.png?width=600&height=300)
+
+> sinh(z), Mod-Arg
