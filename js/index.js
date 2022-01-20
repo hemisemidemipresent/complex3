@@ -32,7 +32,6 @@ light.position.setScalar(10);
 scene.add(light);
 scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-const axesColor = 0x5ca4a9;
 const color = 0xd69dff;
 const length = 10;
 let multiplier = document.getElementById('gpuLevel').value;
@@ -77,6 +76,8 @@ function createGrid() {
         let width = 5;
         if (i == 0) width = 20;
 
+        let axesColor = 0xd69dff;
+
         line.vertices.push(new THREE.Vector3(i, 0, -length));
         line.vertices.push(new THREE.Vector3(i, 0, length));
         makeLine(line, axesColor, width);
@@ -110,6 +111,8 @@ function createMesh() {
             legend.innerHTML =
                 'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
     } else {
+        if (isBW) toggleBW();
+
         legend.innerHTML =
             'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
     }
@@ -149,7 +152,6 @@ function createMesh() {
                 colors.push(sigmoid_re, sigmoid_re, sigmoid_re);
             }
         } else {
-            if (isBW) toggleBW();
             try {
                 plane.attributes.position.setZ(i, output.abs());
             } catch (e) {
@@ -169,7 +171,7 @@ function createMesh() {
     if (isShiny)
         mesh = new THREE.Mesh(
             plane,
-            new THREE.MeshPhongMaterial({
+            new THREE.MeshStandardMaterial({
                 vertexColors: THREE.VertexColors,
                 side: THREE.DoubleSide,
                 specular: '#333333',
