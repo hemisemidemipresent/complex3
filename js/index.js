@@ -89,13 +89,32 @@ function createGrid() {
     graph.add(grid);
 }
 
-async function createMesh() {
+function createMesh() {
     let width = 2 * length; // 20
     let height = width;
     let segments = multiplier * width;
     let plane = new THREE.PlaneBufferGeometry(width, height, segments, segments);
-
+    let legend = document.getElementById('legend');
+    if (plot == 'Re-Im') {
+        if (isBW)
+            legend.innerHTML =
+                'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), light cyan = 0, black = smaller Im(f(z))';
+        else
+            legend.innerHTML =
+                'height of surface = Re(f(z))<br>color of surface - magenta = bigger Im(f(z)), light cyan = 0, red = smaller Im(f(z))';
+    } else if (plot == 'Im-Re') {
+        if (isBW)
+            legend.innerHTML =
+                'height of surface = Im(f(z))<br>color of surface - magenta = bigger Re(f(z)), red = smaller Re(f(z))';
+        else
+            legend.innerHTML =
+                'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
+    } else {
+        legend.innerHTML =
+            'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
+    }
     let colors = [];
+    console.log(plane.attributes.position.count);
     for (let i = 0; i < plane.attributes.position.count; i++) {
         let im = (i % (segments + 1)) - segments / 2;
         im /= multiplier;
@@ -111,19 +130,14 @@ async function createMesh() {
         // idk why this happens
         if (typeof output == 'number') output = math.complex(output, 0);
 
-        let legend = document.getElementById('legend');
         if (plot == 'Re-Im') {
             plane.attributes.position.setZ(i, output.re);
             let sigmoid_im = sig(output.im);
             if (isBW) {
                 colors.push(sigmoid_im, sigmoid_im, sigmoid_im);
-                legend.innerHTML =
-                    'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), light cyan = 0, black = smaller Im(f(z))';
             } else {
                 let color = HSVtoRGB(sigmoid_im, saturation, 1);
                 colors.push(color.r / 255, color.g / 255, color.b / 255);
-                legend.innerHTML =
-                    'height of surface = Re(f(z))<br>color of surface - magenta = bigger Im(f(z)), light cyan = 0, red = smaller Im(f(z))';
             }
         } else if (plot == 'Im-Re') {
             plane.attributes.position.setZ(i, output.im);
@@ -131,12 +145,8 @@ async function createMesh() {
             if (isBW) {
                 let color = HSVtoRGB(sigmoid_re, saturation, 1);
                 colors.push(color.r / 255, color.g / 255, color.b / 255);
-                legend.innerHTML =
-                    'height of surface = Im(f(z))<br>color of surface - magenta = bigger Re(f(z)), red = smaller Re(f(z))';
             } else {
                 colors.push(sigmoid_re, sigmoid_re, sigmoid_re);
-                legend.innerHTML =
-                    'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
             }
         } else {
             if (isBW) toggleBW();
@@ -149,8 +159,6 @@ async function createMesh() {
             if (arg < 0) arg += 1;
             let color = HSVtoRGB(arg, saturation, 1);
             colors.push(color.r / 255, color.g / 255, color.b / 255);
-            legend.innerHTML =
-                'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
         }
     }
 
@@ -223,13 +231,13 @@ function createText() {
     });
 }
 
-async function load() {
+function load() {
     multiplier = document.getElementById('gpuLevel').value;
     plot = plotChooser.value;
     try {
         func = math.parse(inputBox.value).compile().evaluate;
         errPara.innerText = '';
-        let mesh = await createMesh();
+        let mesh = createMesh();
         clearMesh();
         graph.add(mesh);
     } catch (e) {
@@ -246,17 +254,13 @@ function throwInvalidJS() {
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function render() {
     requestAnimationFrame(render);
     controls.update();
-    if (isRotate) {
-        // graph.rotation.y += 0.05 * clock.getDelta();
-        graph.rotation.y += 0.001;
-    }
+    if (isRotate) graph.rotation.y += 0.001; // graph.rotation.y += 0.05 * clock.getDelta();
     renderer.render(scene, camera);
 }
 
@@ -337,7 +341,6 @@ function exportImg() {
     element.click();
     document.removeChild(element);
     // remove preserveDrawingBuffer canvas
-
     container.innerHTML = '';
     initRenderer();
 }
@@ -357,7 +360,6 @@ function toggleShiny() {
 function toggleBW() {
     if (isBW) bwBtn.innerText = 'Switch to B/W';
     else bwBtn.innerText = 'Switch to color';
-
     isBW = !isBW;
     load();
 }
