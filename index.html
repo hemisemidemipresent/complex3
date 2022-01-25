@@ -22,11 +22,7 @@
         <p>
             grid = input plane of complex numbers (ℂ)<br>
         <p id='legend'>height of surface = real part<br>color of surface -
-            white = bigger Im, black = smaller Im</p>
-
-        <p> This website uses <a href="https://mathjs.org/">Math.js
-            </a></p>
-
+            white = bigger Im(f(z)), black = smaller Im(f(z))</p>
         </p>
         <div id="conv">
             <p>f(z) = </p><textarea id="fn" type="text">z^3/100+1+i</textarea>
@@ -39,10 +35,10 @@
             <option value="Mod-Arg">Mod-Arg</option>
         </select>
         <div id='gpu'>
-            <label for="gpuLevel">How good is your device/How accurate do you want the graph on a scale: <br> from 1
-                (bad) to 99999999999 (NASA):</label>
+            <label for="    ">How good is your device/How accurate do you want the graph on a scale: <br> from 1
+                (bad) to 999 (NASA):</label>
 
-            <input type="number" id="gpuLevel" name="gpuLevel" min="1" max="99999999999" value="1">
+            <input type="number" id="gpuLevel" name="gpuLevel" min="1" max="999" value="1">
         </div>
         <button onclick="load()" class="btn">Load</button>
         <button onclick="toggleRot()" class="btn" id="rotBtn">Rotate On</button>
@@ -60,10 +56,11 @@
 </body>
 <script src="js/three/three.min.js"></script>
 <script src="js/three/OrbitControls.js"></script>
-<script src="js/three/THREE.MeshLine.js"></script>
-<script src="js/math/math.min.js"></script>
+<script src="js/three/THREE.MeshLine.min.js"></script>
 
-<script src="js/index.js"></script>
+<script type="module" src="./rust/pkg/complex_parser.js"></script>
+
+<script defer src="js/index.js"></script>
 <script src="js/GUI.js"></script>
 
 </html>

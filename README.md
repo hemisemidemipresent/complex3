@@ -10,7 +10,7 @@
 
 > example of a Mod-Arg plot
 
-Uses [Math.js](https://mathjs.org/) for expression parsing and evaluation and [three.js](https://threejs.org/) for visualising functions
+Uses a custom rust expression parser and evaluator (in `./rust`) compiled to wasm
 
 ## Features
 

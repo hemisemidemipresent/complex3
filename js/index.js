@@ -44,15 +44,15 @@ let graph = new THREE.Object3D();
 let grid = new THREE.Object3D();
 grid.name = grid;
 scene.add(graph);
-createText();
+
 createGrid();
-load();
+createText();
+window.init().then(() => {
+    load();
+});
 render();
 onWindowResize();
 window.addEventListener('resize', onWindowResize);
-let f = 'z^2';
-let j = math.parse(f).compile().evaluate;
-let out = j({ z: math.complex(1, 1) });
 function makeLine(geo, color, lineWidth = 10, opacity = 1) {
     const g = new MeshLine();
     g.setGeometry(geo);
@@ -66,6 +66,7 @@ function makeLine(geo, color, lineWidth = 10, opacity = 1) {
         lineWidth: lineWidth
     });
     const mesh = new THREE.Mesh(g.geometry, material);
+    mesh.name = 'gridline';
     grid.add(mesh);
 }
 
@@ -91,105 +92,82 @@ function createGrid() {
 }
 
 function createMesh() {
-    let width = 2 * length; // 20
-    let height = width;
-    let segments = multiplier * width;
-    let plane = new THREE.PlaneBufferGeometry(width, height, segments, segments);
-    let legend = document.getElementById('legend');
-    if (plot == 'Re-Im') {
-        if (isBW)
-            legend.innerHTML =
-                'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), light cyan = 0, black = smaller Im(f(z))';
-        else
-            legend.innerHTML =
-                'height of surface = Re(f(z))<br>color of surface - magenta = bigger Im(f(z)), light cyan = 0, red = smaller Im(f(z))';
-    } else if (plot == 'Im-Re') {
-        if (isBW)
-            legend.innerHTML =
-                'height of surface = Im(f(z))<br>color of surface - magenta = bigger Re(f(z)), red = smaller Re(f(z))';
-        else
-            legend.innerHTML =
-                'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
-    } else {
-        if (isBW) toggleBW();
-
-        legend.innerHTML =
-            'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
-    }
-    let colors = [];
-    console.log(plane.attributes.position.count);
-    for (let i = 0; i < plane.attributes.position.count; i++) {
-        let im = (i % (segments + 1)) - segments / 2;
-        im /= multiplier;
-        let re = (i - (i % (segments + 1))) / (segments + 1) - segments / 2;
-        re /= multiplier;
-        let input = math.complex(re, im);
-        let output = func({ z: input });
-        // infinity handling
-        let basicallyInfinity = 1e9;
-        if (output == Infinity) output = math.complex(Infinity, Infinity);
-        if (output.re == Infinity) output.re = basicallyInfinity;
-        if (output.im == Infinity) output.im = basicallyInfinity;
-        // idk why this happens
-        if (typeof output == 'number') output = math.complex(output, 0);
-
+    return new Promise(function (resolve, reject) {
+        let width = 2 * length; // 20
+        let height = width;
+        let segments = multiplier * width;
+        let plane = new THREE.PlaneBufferGeometry(width, height, segments, segments);
+        let legend = document.getElementById('legend');
         if (plot == 'Re-Im') {
-            plane.attributes.position.setZ(i, output.re);
-            let sigmoid_im = sig(output.im);
-            if (isBW) {
-                colors.push(sigmoid_im, sigmoid_im, sigmoid_im);
-            } else {
-                let color = HSVtoRGB(sigmoid_im, saturation, 1);
-                colors.push(color.r / 255, color.g / 255, color.b / 255);
-            }
+            if (isBW)
+                legend.innerHTML =
+                    'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), black = smaller Im(f(z))';
+            else
+                legend.innerHTML =
+                    'height of surface = Re(f(z))<br>color of surface - magenta = bigger Im(f(z)), light cyan = 0, red = smaller Im(f(z))';
         } else if (plot == 'Im-Re') {
-            plane.attributes.position.setZ(i, output.im);
-            let sigmoid_re = sig(output.re);
-            if (isBW) {
-                let color = HSVtoRGB(sigmoid_re, saturation, 1);
-                colors.push(color.r / 255, color.g / 255, color.b / 255);
-            } else {
-                colors.push(sigmoid_re, sigmoid_re, sigmoid_re);
-            }
+            if (isBW)
+                legend.innerHTML =
+                    'height of surface = Im(f(z))<br>color of surface - magenta = bigger Re(f(z)), red = smaller Re(f(z))';
+            else
+                legend.innerHTML =
+                    'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
         } else {
-            try {
-                plane.attributes.position.setZ(i, output.abs());
-            } catch (e) {
-                console.log(output);
-            }
-            let arg = output.arg() / Math.PI / 2;
-            if (arg < 0) arg += 1;
-            let color = HSVtoRGB(arg, saturation, 1);
-            colors.push(color.r / 255, color.g / 255, color.b / 255);
+            if (isBW) toggleBW();
+            legend.innerHTML =
+                'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
         }
-    }
+        let graph_type = 4;
+        if (plot == 'Re-Im') {
+            if (isBW) graph_type = 1;
+            else graph_type = 0;
+        } else if (plot == 'Im-Re') {
+            if (isBW) graph_type = 3;
+            else graph_type = 2;
+        }
+        let res = window.evaluate(inputBox.value, multiplier, graph_type);
+        let posLen = 3 * Math.pow(20 * multiplier + 1, 2);
+        let pos = res.slice(0, posLen);
+        let colors = res.slice(posLen);
 
-    plane.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+        // color logging
+        // for (let i = 0; i < colors.length; i += 3) {
+        //     let r = parseInt(colors[i] * 255);
+        //     let g = parseInt(colors[i + 1] * 255);
+        //     let b = parseInt(colors[i + 2] * 255);
+        //     let R = r.toString(16);
+        //     let G = g.toString(16);
+        //     let B = b.toString(16);
+        //     console.log('%c#' + R + G + B, `color:#${R + G + B}`);
+        // }
+        plane.attributes.position.array = pos;
+        plane.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
 
-    plane.computeVertexNormals();
-    let mesh;
-    if (isShiny)
-        mesh = new THREE.Mesh(
-            plane,
-            new THREE.MeshStandardMaterial({
-                vertexColors: THREE.VertexColors,
-                side: THREE.DoubleSide,
-                specular: '#333333',
-                transparent: true,
-                opacity: 0.7
-            })
-        );
-    else
-        mesh = new THREE.Mesh(
-            plane,
-            new THREE.MeshLambertMaterial({
-                vertexColors: THREE.VertexColors,
-                side: THREE.DoubleSide
-            })
-        );
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.name = 'mesh';
-    return mesh;
+        plane.computeVertexNormals();
+        let mesh;
+        if (isShiny)
+            mesh = new THREE.Mesh(
+                plane,
+                new THREE.MeshStandardMaterial({
+                    vertexColors: THREE.VertexColors,
+                    side: THREE.DoubleSide,
+                    specular: '#333333',
+                    transparent: true,
+                    opacity: 0.7
+                })
+            );
+        else
+            mesh = new THREE.Mesh(
+                plane,
+                new THREE.MeshLambertMaterial({
+                    vertexColors: THREE.VertexColors,
+                    side: THREE.DoubleSide
+                })
+            );
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.name = 'mesh';
+        resolve(mesh);
+    });
 }
 
 function createText() {
@@ -211,11 +189,9 @@ function createText() {
         ];
 
         let ImMesh = new THREE.Mesh(Imlabel, materials);
-        ImMesh.position.x = length;
-        ImMesh.rotation.x = 3.14159 / 2;
-        ImMesh.rotation.y = 3.14159;
-        ImMesh.rotation.z = 3.14159 / 2;
-
+        ImMesh.position.z = -length;
+        ImMesh.rotation.x = -Math.PI / 2;
+        ImMesh.name = 'ImMesh';
         graph.add(ImMesh);
 
         let Relabel = new THREE.TextGeometry('Re', options);
@@ -224,11 +200,9 @@ function createText() {
             new THREE.MeshPhongMaterial({ color: null }) // side
         ];
         let ReMesh = new THREE.Mesh(Relabel, materials);
-        ReMesh.position.z = length;
-        ReMesh.rotation.x = 3.14159 / 2;
-        ReMesh.rotation.y = 3.14159;
-        ReMesh.rotation.z = 3.14159 / 2;
-
+        ReMesh.position.x = length;
+        ReMesh.rotation.x = -Math.PI / 2;
+        ReMesh.name = 'ReMesh';
         graph.add(ReMesh);
     });
 }
@@ -236,16 +210,10 @@ function createText() {
 function load() {
     multiplier = document.getElementById('gpuLevel').value;
     plot = plotChooser.value;
-    try {
-        func = math.parse(inputBox.value).compile().evaluate;
-        errPara.innerText = '';
-        let mesh = createMesh();
-        clearMesh();
+    clearMesh();
+    createMesh().then((mesh) => {
         graph.add(mesh);
-    } catch (e) {
-        func = math.parse('z').compile().evaluate;
-        console.log(e);
-    }
+    });
 }
 
 function throwInvalidJS() {
@@ -266,50 +234,16 @@ function render() {
     renderer.render(scene, camera);
 }
 
-function HSVtoRGB(h, s, v) {
-    var r, g, b, i, f, p, q, t;
-    if (arguments.length === 1) {
-        (s = h.s), (v = h.v), (h = h.h);
-    }
-    i = Math.floor(h * 6);
-    f = h * 6 - i;
-    p = v * (1 - s);
-    q = v * (1 - f * s);
-    t = v * (1 - (1 - f) * s);
-    switch (i % 6) {
-        case 0:
-            (r = v), (g = t), (b = p);
-            break;
-        case 1:
-            (r = q), (g = v), (b = p);
-            break;
-        case 2:
-            (r = p), (g = v), (b = t);
-            break;
-        case 3:
-            (r = p), (g = q), (b = v);
-            break;
-        case 4:
-            (r = t), (g = p), (b = v);
-            break;
-        case 5:
-            (r = v), (g = p), (b = q);
-            break;
-    }
-
-    r = Math.round(r * 255);
-    g = Math.round(g * 255);
-    b = Math.round(b * 255);
-    return { r, g, b };
-}
-// sigmoid
-function sig(x) {
-    return 1 / (1 + Math.pow(Math.E, -x));
-}
-
 function clearMesh() {
     for (let i = 0; i < graph.children.length; i++) {
-        if (graph.children[i].name == 'mesh') graph.remove(graph.children[i]);
+        if (graph.children[i].name == 'mesh') {
+            graph.remove(graph.children[i]);
+        }
+    }
+    for (let i = 0; i < graph.children.length; i++) {
+        if (graph.children[i].name == 'mesh') {
+            graph.remove(graph.children[i]);
+        }
     }
 }
 
