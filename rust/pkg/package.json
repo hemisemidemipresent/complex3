@@ -1,0 +1,12 @@
+{
+  "name": "complex-parser",
+  "version": "0.1.0",
+  "files": [
+    "complex_parser_bg.wasm",
+    "complex_parser.js",
+    "complex_parser.d.ts"
+  ],
+  "module": "complex_parser.js",
+  "types": "complex_parser.d.ts",
+  "sideEffects": false
+}
