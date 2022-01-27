@@ -263,7 +263,7 @@ function exportImg() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     load();
-    render();
+    renderer.render(scene, camera);
     // image stuff
     let imgData = document.getElementsByTagName('canvas')[0].toDataURL('image/png');
     var element = document.createElement('a');
