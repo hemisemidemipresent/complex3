@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/switch.css">
     <link rel="stylesheet" href="css/book.css">
+    <link rel="stylesheet" href="css/help.css">
+
     <script defer src="https://kit.fontawesome.com/59d09dda3d.js" crossorigin="anonymous"></script>
 
 </head>
@@ -46,11 +48,34 @@
         <button onclick="toggleBW()" class="btn" id="bwBtn">Switch to color</button>
 
         <br>
-        <a id="gh" href="https://github.com/hemisemidemipresent/complex3">Github</a>
+        <a id="gh" href="https://github.com/hemisemidemipresent/complex3">Star this project on Github</a>
+    </div>
+
+    <div id="sidebar">
+        <h1>A 3D web-based complex function grapher </h1>
+        <p>What exactly am I looking at? I still don't understand.<br>There is a section of <a
+                href="https://youtu.be/NtoIXhUgqSk?t=215">this video</a> that nicely explains it
+        </p>
+        <br>
+        <h2>List of functions</h2>
+        <p>Supported operations: <code>+ - * / ^</code></p>
+        <p>Trigonometric: sin,cos,tan,csc,sec,cot</p>
+        <p>Inverse Trigonometric: asin,acos,atan,acsc,asec,acot</p>
+        <p>Hyperbolic Trigonometric: sinh,cosh,tanh,csch,sech,coth</p>
+        <p>Inverse Hyperbolic Trigonometric: asinh,acosh,atanh,acsch,asech,acoth</p>
+        <p>E: exp,ln</p>
+        <p>Roots: sqrt,cbrt</p>
+        <p>Misc: conj,inv,Re,Im,mod (or norm),arg</p>
+        <p>Gamma: lngamma,gamma,digamma,trigamma, and<br>polygamma (accepts 2 inputs, second input is m - read
+            more <a href="https://en.wikipedia.org/wiki/Polygamma_function">here</a>)</p>
+        <p>Zeta: zeta,zetac(accepts 2 inputs, second input is how precise it is)<br>It is reccomended that you do
+            something like zeta(3*z) (btw default zeta is at 25)</p>
+
     </div>
     <div id="book">
         <button class="icon" onclick="toggleBook() "><i class="fas fa-book fa-2x"></i></button>
         <button class="icon" onclick="exportImg()"><i class="fas fa-camera fa-2x"></i></button>
+        <button class="icon" onclick="helpClicked()"><i class="fas fa-question fa-2x"></i></button>
 
     </div>
 </body>

@@ -1,0 +1,9 @@
+#sidebar {
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(36, 36, 36, 0.69);
+    color: white;
+    padding: 1em;
+}

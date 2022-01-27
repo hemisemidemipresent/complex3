@@ -1,6 +1,8 @@
 let wasm;
 
-let WASM_VECTOR_LEN = 0;
+let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+
+cachedTextDecoder.decode();
 
 let cachegetUint8Memory0 = null;
 function getUint8Memory0() {
@@ -9,6 +11,12 @@ function getUint8Memory0() {
     }
     return cachegetUint8Memory0;
 }
+
+function getStringFromWasm0(ptr, len) {
+    return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+}
+
+let WASM_VECTOR_LEN = 0;
 
 let cachedTextEncoder = new TextEncoder('utf-8');
 
@@ -141,6 +149,10 @@ async function init(input) {
         input = new URL('complex_parser_bg.wasm', import.meta.url);
     }
     const imports = {};
+    imports.wbg = {};
+    imports.wbg.__wbindgen_throw = function (arg0, arg1) {
+        throw new Error(getStringFromWasm0(arg0, arg1));
+    };
 
     if (
         typeof input === 'string' ||

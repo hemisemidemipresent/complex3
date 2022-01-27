@@ -9,3 +9,7 @@ parser infrastructure is from https://github.com/rodolf0/tox/
 | `2`         | Im-Re, Color     |
 | `3`         | Im-Re, BW        |
 | `4`         | Mod-Arg, (Color) |
+
+```
+wasm-pack build --target web
+```

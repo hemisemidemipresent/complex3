@@ -1,7 +1,16 @@
 let title = document.getElementById('title');
-let shown = true;
+let sidebar = document.getElementById('sidebar');
+
+let titleShown = true;
+let sidebarShown = false;
 function toggleBook() {
-    shown = !shown;
-    if (shown) title.style.display = 'block';
+    titleShown = !titleShown;
+    if (titleShown) title.style.display = 'block';
     else title.style.display = 'none';
+}
+
+function helpClicked() {
+    sidebarShown = !sidebarShown;
+    if (sidebarShown) sidebar.style.display = 'block';
+    else sidebar.style.display = 'none';
 }

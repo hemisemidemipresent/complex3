@@ -1,9 +1,10 @@
 use crate::math_tokenizer::MathToken;
 use crate::parser::RPNExpr;
 use num_complex::Complex32;
+use spfunc::gamma::*;
 use std::collections::HashMap;
 use std::f32::consts::PI;
-use std::f32::INFINITY;
+pub use std::f32::{INFINITY, NEG_INFINITY};
 
 // its a secret tool that will help us later
 // // a shorthand for checking number of arguments before eval_fn
@@ -131,17 +132,23 @@ impl MathContext {
             "inv" => nargs!(args.len() == 1, Ok(args[0].inv())),
             "sqrt" => nargs!(args.len() == 1, Ok(args[0].sqrt())),
             "cbrt" => nargs!(args.len() == 1, Ok(args[0].cbrt())),
-            //
+            // util?
             "Re" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].re, 0.))),
             "Im" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].im, 0.))),
             "norm" | "mod" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].norm(), 0.))),
             "arg" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].arg(), 0.))),
-            // special shit
-            "zeta" => nargs!(args.len() == 1, Ok(zeta(args[0], 69))),
-            "zetaf" => nargs!(args.len() == 1, Ok(zeta(args[0], 15))), // zeta fast
-            "zetac" => nargs!(args.len() == 2, Ok(zeta(args[0], args[1].re.round() as u8))), // zeta custom
+            // special fns
+            "zeta" => nargs!(args.len() == 1, Ok(zeta(args[0], 25))),
+            "zetac" => nargs!(args.len() == 2, Ok(zeta(args[0], args[1].norm() as i32))),
 
             "gamma" => nargs!(args.len() == 1, Ok(gamma(args[0]))),
+            "lngamma" => nargs!(args.len() == 1, Ok(gamma_ln(args[0]))),
+            "digamma" => nargs!(args.len() == 1, Ok(digamma(args[0]))),
+            "trigamma" => nargs!(args.len() == 1, Ok(polygamma(args[0], 1))),
+            "polygamma" => nargs!(
+                args.len() == 2,
+                Ok(polygamma(args[0], (args[1].norm() as u8).into()))
+            ),
 
             // final
             _ => nargs!(args.len() == 1, Ok(args[0])),
@@ -149,7 +156,8 @@ impl MathContext {
     }
 }
 
-fn gamma(z: Complex32) -> Complex32 {
+pub fn gamma(z: Complex32) -> Complex32 {
+    let g = 7; // 15 max
     let gamma_p = vec![
         0.99999999999999709182,
         57.156235665862923517,
@@ -181,7 +189,7 @@ fn gamma(z: Complex32) -> Complex32 {
     let mut x = Complex32::new(gamma_p[0], 0.);
     // gamma_p length is 15
     // for (i, gamma_pval) in enumerate(gamma_p):
-    for i in 1..15 {
+    for i in 1..g {
         // x += gamma_pval / (n + i)
         // let gamma_pval = Complex32::new(gamma_p[i], 0.);
         // x += gamma_pval / (n + Complex32::new(i as f32, 0.))
@@ -197,8 +205,7 @@ fn gamma(z: Complex32) -> Complex32 {
         * (-t).exp()
         * Complex32::new(sqrt_2_pi, 0.);
 }
-
-fn zeta(z: Complex32, t: u8) -> Complex32 {
+pub fn zeta(z: Complex32, t: i32) -> Complex32 {
     if z.re == 1. && z.im == 0. {
         return Complex32::new(INFINITY, 0.);
     }
@@ -213,16 +220,14 @@ fn zeta(z: Complex32, t: u8) -> Complex32 {
             res += idk;
         }
         let j = (2 as i128).pow((n + 1) as u32) as f32;
-
         let resj = Complex32::new(res.re / j, res.im / j); // res/j
         result += resj;
     }
-
     return result
         / (-Complex32::new(2., 0.).powc(-z + Complex32::new(1., 0.)) + Complex32::new(1., 0.));
 }
 
-fn sign(k: u8) -> f32 {
+fn sign(k: i32) -> f32 {
     if k % 2 == 0 {
         return 1.0;
     } else {
