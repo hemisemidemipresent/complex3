@@ -1,7 +1,8 @@
 use crate::math_tokenizer::MathToken;
 use crate::parser::RPNExpr;
-use num_complex::Complex32;
+use num_complex::{Complex32, Complex64};
 use spfunc::gamma::*;
+// use spfunc::zeta::{zeta, zetah};
 use std::collections::HashMap;
 use std::f32::consts::PI;
 pub use std::f32::{INFINITY, NEG_INFINITY};
@@ -138,8 +139,8 @@ impl MathContext {
             "norm" | "mod" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].norm(), 0.))),
             "arg" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].arg(), 0.))),
             // special fns
-            "zeta" => nargs!(args.len() == 1, Ok(zeta(args[0], 25))),
-            "zetac" => nargs!(args.len() == 2, Ok(zeta(args[0], args[1].norm() as i32))),
+            "zeta" => nargs!(args.len() == 1, Ok(zeta3(args[0], 25))),
+            "zetac" => nargs!(args.len() == 2, Ok(zeta3(args[0], args[1].norm() as i32))),
 
             "gamma" => nargs!(args.len() == 1, Ok(gamma(args[0]))),
             "lngamma" => nargs!(args.len() == 1, Ok(gamma_ln(args[0]))),
@@ -205,26 +206,57 @@ pub fn gamma(z: Complex32) -> Complex32 {
         * (-t).exp()
         * Complex32::new(sqrt_2_pi, 0.);
 }
-pub fn zeta(z: Complex32, t: i32) -> Complex32 {
+
+// pub fn zeta1(z: Complex32, t: i32) -> Complex32 {
+//     if z.re == 1. && z.im == 0. {
+//         return Complex32::new(INFINITY, 0.);
+//     }
+//     let mut result = Complex32::new(0., 0.);
+//     for n in 0..t {
+//         let mut res = Complex32::new(0., 0.);
+//         for k in 0..=n {
+//             let k1 = Complex32::new((k + 1) as f32, 0.).powc(-z);
+//             let binom = binom(n as i128, k as i128);
+//             let f = sign(k) * binom as f32;
+//             let idk = k1 * Complex32::new(f, 0.);
+//             res += idk;
+//         }
+//         let j = (2 as i128).pow((n + 1) as u32) as f32;
+//         let resj = Complex32::new(res.re / j, res.im / j); // res/j
+//         result += resj;
+//     }
+//     return result
+//         / (-Complex32::new(2., 0.).powc(-z + Complex32::new(1., 0.)) + Complex32::new(1., 0.));
+// }
+pub fn zeta3(z: Complex32, t: i32) -> Complex32 {
+    if z.re > 10.0 {
+        return Complex32::new(1.0, 0.0); // very rough approximation but this prevents overflow causing an err
+    }
+    // trivial zeroes
+    if z.im == 0.0 && z.re < 0.0 && z.re % 2.0 == 0.0 {
+        return Complex32::new(0.0, 0.0);
+    }
     if z.re == 1. && z.im == 0. {
         return Complex32::new(INFINITY, 0.);
     }
-    let mut result = Complex32::new(0., 0.);
+    let negz = -Complex64::new(z.re as f64, z.im as f64);
+    let mut result = Complex64::new(0., 0.);
     for n in 0..t {
-        let mut res = Complex32::new(0., 0.);
+        let mut res = Complex64::new(0., 0.);
         for k in 0..=n {
-            let k1 = Complex32::new((k + 1) as f32, 0.).powc(-z);
+            let k1 = Complex64::new((k + 1) as f64, 0.).powc(negz);
             let binom = binom(n as i128, k as i128);
-            let f = sign(k) * binom as f32;
-            let idk = k1 * Complex32::new(f, 0.);
+            let f = sign(k) as f64 * binom as f64;
+            let idk = k1 * Complex64::new(f, 0.);
             res += idk;
         }
-        let j = (2 as i128).pow((n + 1) as u32) as f32;
-        let resj = Complex32::new(res.re / j, res.im / j); // res/j
+        let j = (2 as i128).pow((n + 1) as u32) as f64;
+        let resj = Complex64::new(res.re / j, res.im / j); // res/j
         result += resj;
     }
-    return result
-        / (-Complex32::new(2., 0.).powc(-z + Complex32::new(1., 0.)) + Complex32::new(1., 0.));
+    let returned = result
+        / (-Complex64::new(2., 0.).powc(negz + Complex64::new(1., 0.)) + Complex64::new(1., 0.));
+    return Complex32::new(returned.re as f32, returned.im as f32);
 }
 
 fn sign(k: i32) -> f32 {
