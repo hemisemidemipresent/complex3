@@ -150,6 +150,11 @@ impl MathContext {
                 args.len() == 2,
                 Ok(polygamma(args[0], (args[1].norm() as u8).into()))
             ),
+            "lambertw" => nargs!(args.len() == 1, Ok(lambertw(args[0], 0))),
+            "lambertwb" => nargs!(
+                args.len() == 2,
+                Ok(lambertw(args[0], args[1].norm() as i32))
+            ),
 
             // final
             _ => nargs!(args.len() == 1, Ok(args[0])),
@@ -228,6 +233,8 @@ pub fn gamma(z: Complex32) -> Complex32 {
 //     return result
 //         / (-Complex32::new(2., 0.).powc(-z + Complex32::new(1., 0.)) + Complex32::new(1., 0.));
 // }
+
+// zeta fn
 pub fn zeta3(z: Complex32, t: i32) -> Complex32 {
     if z.re > 10.0 {
         return Complex32::new(1.0, 0.0); // very rough approximation but this prevents overflow causing an err
@@ -236,6 +243,7 @@ pub fn zeta3(z: Complex32, t: i32) -> Complex32 {
     if z.im == 0.0 && z.re < 0.0 && z.re % 2.0 == 0.0 {
         return Complex32::new(0.0, 0.0);
     }
+    // the pole
     if z.re == 1. && z.im == 0. {
         return Complex32::new(INFINITY, 0.);
     }
@@ -273,4 +281,91 @@ fn binom(n: i128, k: i128) -> i128 {
         r /= d;
         r
     })
+}
+
+// lambertw
+pub fn zexpz(z: Complex32) -> Complex32 {
+    return z * z.exp();
+}
+//The derivative of z * exp(z) = exp(z) + z * exp(z)
+pub fn zexpz_d(z: Complex32) -> Complex32 {
+    return z.exp() + z * z.exp();
+}
+//The second derivative of z * exp(z) = 2. * exp(z) + z * exp(z)
+
+pub fn zexpz_dd(z: Complex32) -> Complex32 {
+    return Complex32::new(2., 0.) * z.exp() + z * z.exp();
+}
+
+pub fn init_point(z: Complex32, k: i32) -> Complex32 {
+    let i = Complex32::new(0., 1.);
+    let two_pi_k_i = Complex32::new(0., 2. * PI * k as f32);
+    let mut ip = z.ln() + two_pi_k_i - (z.ln() + two_pi_k_i).ln(); // initial point coming from the general asymptotic approximation
+    let p = (Complex32::new(2., 0.) * (z.exp() + Complex32::new(1., 0.))).sqrt(); // used when we are close to the branch cut around zero and when k=0,-1
+
+    if (z - (-f32::exp(-1.))).norm() <= 1. {
+        //we are close to the branch cut, the initial point must be chosen carefully
+        if k == 0 {
+            ip = Complex32::new(-1., 0.) + p - Complex32::new(1. / 3., 0.) * p.powi(2)
+                + Complex32::new(11. / 72., 0.) * p.powi(3);
+        }
+        if k == 1 && (z.im < 0. || z.im > 0.) {
+            ip = Complex32::new(-1., 0.) - p - Complex32::new(1. / 3., 0.) * p.powi(2)
+                + Complex32::new(11. / 72., 0.) * p.powi(3);
+        }
+    }
+    let one = Complex32::new(1., 0.);
+    let two = Complex32::new(2., 0.);
+
+    if k == 0 && (z - Complex32::new(0.5, 0.)).norm() <= 0.5 {
+        let c1 = Complex32::new(0.35173371, 0.);
+        let c2 = Complex32::new(0.1237166, 0.);
+        let c3 = Complex32::new(7.061302897, 0.);
+        let c4 = Complex32::new(0.827184, 0.0);
+        ip = (c1 * (c2 + c3 * z)) / (two + c4 * (one + two * z))
+    }
+    if k == -1 && (z - Complex32::new(0.5, 0.)).norm() <= 0.5 {
+        // (1,1) Pade approximant for W(-1,a)
+        let c1 = Complex32::new(2.2591588985, 4.22096);
+        let c2 = Complex32::new(-14.073271, -33.767687754);
+        let c3 = Complex32::new(12.7127, 19.071643);
+        let c4 = Complex32::new(17.23103, 10.629721);
+        ip = -((c1 * (c2 * z - c3 * (one + two * z))) / (two - c4 * (one + two * z)));
+    }
+    return ip;
+}
+
+pub fn lambertw(z: Complex32, k: i32) -> Complex32 {
+    if z.re == 0. && z.im == 0. {
+        if k == 0 {
+            return Complex32::new(0., 0.);
+        } else {
+            return Complex32::new(NEG_INFINITY, 0.);
+        }
+    }
+    // if z.re == -f32::exp(-1.) && (k == 0 || k == -1) {
+    //     return Complex32::new(-1., 0.);
+    // }
+    // if z.re == f32::exp(-1.) && k == 0 {
+    //     return Complex32::new(1., 0.);
+    // }
+    let mut w = init_point(z, k);
+    println!("{}", w);
+
+    let mut wprev = w;
+    let maxiter = 30;
+    let mut iter = 0;
+    let prec = 1E-30;
+    let two = Complex32::new(2., 0.);
+
+    loop {
+        wprev = w;
+        w -= two * ((zexpz(w) - z) * zexpz_d(w))
+            / (two * zexpz_d(w).powi(2) - (zexpz(w) - z) * zexpz_dd(w));
+        if (w - wprev).norm() < prec || iter > maxiter {
+            break;
+        }
+        iter += 1;
+    }
+    return w;
 }
