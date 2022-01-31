@@ -144,7 +144,10 @@ impl MathContext {
 
             "gamma" => nargs!(args.len() == 1, Ok(gamma(args[0]))),
             "lngamma" => nargs!(args.len() == 1, Ok(gamma_ln(args[0]))),
-            "digamma" => nargs!(args.len() == 1, Ok(digamma(args[0]))),
+            "digamma" => nargs!(
+                args.len() == 1,
+                Ok(digamma(args[0] + Complex32::new(0.00001, 0.)))
+            ),
             "trigamma" => nargs!(args.len() == 1, Ok(polygamma(args[0], 1))),
             "polygamma" => nargs!(
                 args.len() == 2,
