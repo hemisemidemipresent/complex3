@@ -13,3 +13,8 @@ parser infrastructure is from https://github.com/rodolf0/tox/
 ```
 wasm-pack build --target web
 ```
+
+```js
+window.init = init;
+window.evaluate = evaluate;
+```

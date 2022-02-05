@@ -1,7 +1,7 @@
 use crate::math_tokenizer::MathToken;
 use crate::parser::RPNExpr;
 use num_complex::{Complex32, Complex64};
-use spfunc::gamma::*;
+use spfunc::gamma::{digamma, gamma_ln};
 // use spfunc::zeta::{zeta, zetah};
 use std::collections::HashMap;
 use std::f32::consts::PI;
@@ -148,11 +148,7 @@ impl MathContext {
                 args.len() == 1,
                 Ok(digamma(args[0] + Complex32::new(0.00001, 0.)))
             ),
-            "trigamma" => nargs!(args.len() == 1, Ok(polygamma(args[0], 1))),
-            "polygamma" => nargs!(
-                args.len() == 2,
-                Ok(polygamma(args[0], (args[1].norm() as u8).into()))
-            ),
+            "trigamma" => nargs!(args.len() == 1, Ok(trigamma(args[0]))),
             "lambertw" => nargs!(args.len() == 1, Ok(lambertw(args[0], 0))),
             "lambertwb" => nargs!(
                 args.len() == 2,
@@ -214,28 +210,58 @@ pub fn gamma(z: Complex32) -> Complex32 {
         * (-t).exp()
         * Complex32::new(sqrt_2_pi, 0.);
 }
+// trigamma
+static TRIGAMMA_ASYMPT_ODD: [f32; 5] =
+    [1.0 / 6.0, -1.0 / 30.0, 1.0 / 42.0, -1.0 / 30.0, 5.0 / 66.0];
+/// Evaluate \sum_{k=0}^n 1 / (z + k)^2
+/// \sum_{k=0}^n \frac{1}{(z + k)^2}
+pub fn jump_sum(z: Complex32, n: i32) -> Complex32 {
+    let mut s = Complex32::new(0., 0.);
 
-// pub fn zeta1(z: Complex32, t: i32) -> Complex32 {
-//     if z.re == 1. && z.im == 0. {
-//         return Complex32::new(INFINITY, 0.);
-//     }
-//     let mut result = Complex32::new(0., 0.);
-//     for n in 0..t {
-//         let mut res = Complex32::new(0., 0.);
-//         for k in 0..=n {
-//             let k1 = Complex32::new((k + 1) as f32, 0.).powc(-z);
-//             let binom = binom(n as i128, k as i128);
-//             let f = sign(k) * binom as f32;
-//             let idk = k1 * Complex32::new(f, 0.);
-//             res += idk;
-//         }
-//         let j = (2 as i128).pow((n + 1) as u32) as f32;
-//         let resj = Complex32::new(res.re / j, res.im / j); // res/j
-//         result += resj;
-//     }
-//     return result
-//         / (-Complex32::new(2., 0.).powc(-z + Complex32::new(1., 0.)) + Complex32::new(1., 0.));
-// }
+    for k in 0..=n {
+        let x: Complex32 = (z.clone() + Complex32::new(k as f32, 0.0)).inv();
+        s += x * x;
+    }
+    s
+}
+/// Evaluate the asymptotic sum (y = 1/x)
+pub fn asym_sum(y: Complex32) -> Complex32 {
+    let y2: Complex32 = y.powi(2);
+    let y3: Complex32 = y.powi(3);
+    let y4: Complex32 = y.powi(4);
+
+    #[allow(non_snake_case)]
+    let mut A: [Complex32; 5] = [Complex32::new(0., 0.); 5];
+    for (a, &b) in A.iter_mut().zip(TRIGAMMA_ASYMPT_ODD.iter()) {
+        *a = Complex32::new(b as f32, 0.)
+    }
+    //let A = TRIGAMMA_ASYMPT_ODD.iter().map(|&a| T::from_f64(a).unwrap()).co
+
+    return y
+        + Complex32::new(0.5, 0.) * y2
+        + y3 * (A[0] + A[1] * y2 + A[2] * y4 + A[3] * y3 * y3 + A[4] * y4 * y4);
+}
+
+pub fn trigamma(z: Complex32) -> Complex32 {
+    let pi = Complex32::new(PI, 0.);
+
+    let y = Complex32::new(5., 0.);
+
+    if z.re < 0. {
+        // reflection formula: \psi_1(z) = \frac{\pi^2}{sin^2\pi z} - \psi_1(1-z)
+        let x: Complex32 = pi * ((pi * z).sin().inv());
+        return x - trigamma(Complex32::new(1., 0.) - z);
+    }
+    if z.re < y.re {
+        // reccurence relation \psi_1(z) = \psi1(z+n) + \sum{k=0}^n \frac{1} {(z + k)^2}
+        let dy = y.re - z.re;
+        let n = dy.ceil() as i32;
+        return trigamma(z + Complex32::new(n as f32, 0.)) + jump_sum(z, n);
+    }
+    let w = z.inv();
+    let psi = asym_sum(w);
+    return psi;
+}
 
 // zeta fn
 pub fn zeta3(z: Complex32, t: i32) -> Complex32 {

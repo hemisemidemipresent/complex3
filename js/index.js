@@ -9,9 +9,9 @@ const bwBtn = document.getElementById('bwBtn');
 const saturation = 0.75;
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+let camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(25, 2.5, 25);
-
+let isPerspective = true;
 let renderer, controls;
 initRenderer();
 function initRenderer() {
@@ -298,4 +298,24 @@ function toggleBW() {
     else bwBtn.innerText = 'Switch to color';
     isBW = !isBW;
     load();
+}
+
+function toggleOrth() {
+    isPerspective = !isPerspective;
+    if (isPerspective) {
+        camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(25, 2.5, 25);
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+    } else {
+        camera = new THREE.OrthographicCamera(
+            window.innerWidth / -2,
+            window.innerWidth / 2,
+            window.innerHeight / 2,
+            window.innerHeight / -2,
+            1,
+            1000
+        );
+        camera.position.set(0, 1000, 0);
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+    }
 }
