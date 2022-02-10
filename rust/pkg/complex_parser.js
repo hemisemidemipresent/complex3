@@ -96,14 +96,15 @@ function getArrayF32FromWasm0(ptr, len) {
  * @param {string} input
  * @param {number} n
  * @param {number} graph_type
+ * @param {boolean} log_height
  * @returns {Float32Array}
  */
-export function evaluate(input, n, graph_type) {
+export function evaluate(input, n, graph_type, log_height) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         var ptr0 = passStringToWasm0(input, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.evaluate(retptr, ptr0, len0, n, graph_type);
+        wasm.evaluate(retptr, ptr0, len0, n, graph_type, log_height);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var v1 = getArrayF32FromWasm0(r0, r1).slice();

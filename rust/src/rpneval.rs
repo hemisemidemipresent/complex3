@@ -2,7 +2,6 @@ use crate::math_tokenizer::MathToken;
 use crate::parser::RPNExpr;
 use num_complex::{Complex32, Complex64};
 use spfunc::gamma::{digamma, gamma_ln};
-// use spfunc::zeta::{zeta, zetah};
 use std::collections::HashMap;
 use std::f32::consts::PI;
 pub use std::f32::{INFINITY, NEG_INFINITY};
@@ -139,8 +138,8 @@ impl MathContext {
             "norm" | "mod" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].norm(), 0.))),
             "arg" => nargs!(args.len() == 1, Ok(Complex32::new(args[0].arg(), 0.))),
             // special fns
-            "zeta" => nargs!(args.len() == 1, Ok(zeta3(args[0], 25))),
-            "zetac" => nargs!(args.len() == 2, Ok(zeta3(args[0], args[1].norm() as i32))),
+            "zeta" => nargs!(args.len() == 1, Ok(zeta(args[0], 25))),
+            "zetac" => nargs!(args.len() == 2, Ok(zeta(args[0], args[1].norm() as i32))),
 
             "gamma" => nargs!(args.len() == 1, Ok(gamma(args[0]))),
             "lngamma" => nargs!(args.len() == 1, Ok(gamma_ln(args[0]))),
@@ -149,6 +148,10 @@ impl MathContext {
                 Ok(digamma(args[0] + Complex32::new(0.00001, 0.)))
             ),
             "trigamma" => nargs!(args.len() == 1, Ok(trigamma(args[0]))),
+            "polygamma" => nargs!(
+                args.len() == 2,
+                Ok(polygamma32(args[0], args[1].norm() as i32))
+            ),
             "lambertw" => nargs!(args.len() == 1, Ok(lambertw(args[0], 0))),
             "lambertwb" => nargs!(
                 args.len() == 2,
@@ -160,7 +163,9 @@ impl MathContext {
         }
     }
 }
-
+// ----------------------------------------------------------------
+// gamma
+// ----------------------------------------------------------------
 pub fn gamma(z: Complex32) -> Complex32 {
     let g = 7; // 15 max
     let gamma_p = vec![
@@ -210,7 +215,9 @@ pub fn gamma(z: Complex32) -> Complex32 {
         * (-t).exp()
         * Complex32::new(sqrt_2_pi, 0.);
 }
+// ----------------------------------------------------------------
 // trigamma
+// ----------------------------------------------------------------
 static TRIGAMMA_ASYMPT_ODD: [f32; 5] =
     [1.0 / 6.0, -1.0 / 30.0, 1.0 / 42.0, -1.0 / 30.0, 5.0 / 66.0];
 /// Evaluate \sum_{k=0}^n 1 / (z + k)^2
@@ -262,9 +269,111 @@ pub fn trigamma(z: Complex32) -> Complex32 {
     let psi = asym_sum(w);
     return psi;
 }
+// --------------------------------------------------------------
+// polygamma fn
+// --------------------------------------------------------------
+pub fn polygamma32(z: Complex32, m: i32) -> Complex32 {
+    let z64 = Complex64::new(z.re as f64, z.im as f64);
+    let res64 = polygamma(z64, m);
+    return Complex32::new(res64.re as f32, res64.im as f32);
+}
+pub fn polygamma(mut z: Complex64, m: i32) -> Complex64 {
+    let pi = Complex64::new(PI as f64, 0.);
+    // Ensure z > 0
+    if z.re < 0. {
+        return signflip(m, polygamma(Complex64::new(1., 0.) - z, m))
+            - pi.powi(m + 1) * md_cot(m, pi * z);
+    }
+    // Ensure |z| > 2*K+m+1
+    let mut result = Complex64::new(0., 0.);
+    let fak = Complex64::new(fac(m) as f64, 0.);
 
+    loop {
+        if z.re < (2 * 7 + m + 1) as f64 {
+            result -= signflip(m, fak * (z.powi(-m - 1)));
+            z += Complex64::new(1., 0.);
+        } else {
+            break;
+        }
+    }
+    // m-th derivative ln(z)
+    let fak2 = Complex64::new(fac(m - 1) as f64, 0.);
+    result += signflip(m - 1, fak2 * z.powi(-m));
+
+    // m-th derivative -1/2z
+    result -= signflip(m, fak * z.powi(-m - 1) / Complex64::new(2.0, 0.0));
+
+    let b2k = vec![
+        1.0,
+        1.0 / 6.0,
+        -1.0 / 30.0,
+        1.0 / 42.0,
+        -1.0 / 30.0,
+        5.0 / 66.0,
+        -691.0 / 2730.0,
+        7.0 / 6.0,
+    ];
+    for i in 1..=7 {
+        // Calculate derivative factor
+        let mut dfac = 1.0;
+        for j in 1..m {
+            dfac *= (2 * i + j) as f64;
+        }
+        result -= signflip(m, dfac * b2k[i as usize] * z.powi(-2 * i - m));
+    }
+    return result;
+}
+pub fn md_cot(m: i32, pi_z: Complex64) -> Complex64 {
+    // sin^(m+1)(pi*z)
+    let s = pi_z.sin().powi(m + 1);
+    // cos(pi*z)
+    let c = pi_z.cos();
+    if m == 2 {
+        return Complex64::new(c.re * 4., c.im * 4.) / s.powi(3);
+    }
+    let poly: Vec<i32>;
+    match m {
+        3 => poly = vec![-2, -4],
+        4 => poly = vec![16, 8],
+        5 => poly = vec![-16, -88, -16],
+        _ => poly = vec![272, 416, 32],
+    }
+    return eval_even_poly(poly, c);
+}
+pub fn fac(m: i32) -> i32 {
+    if m == 0 {
+        return 1;
+    }
+    let mut res = 1;
+    for i in 1..=m {
+        res *= i;
+    }
+    return res;
+}
+// Fast multiplication with (-1)^m (e.g. without using multiplication)
+pub fn signflip(m: i32, z: Complex64) -> Complex64 {
+    if m % 2 == 0 {
+        return z;
+    }
+    return -z;
+}
+
+pub fn eval_even_poly(poly: Vec<i32>, z: Complex64) -> Complex64 {
+    return eval_poly(poly, z.powi(2));
+}
+pub fn eval_poly(poly: Vec<i32>, z: Complex64) -> Complex64 {
+    let len = poly.len();
+    let mut sum = Complex64::new(poly[len - 1] as f64, 0.);
+    for i in 0..(len - 1) {
+        sum *= z;
+        sum += Complex64::new(poly[len - 2 - i] as f64, 0.0);
+    }
+    return sum;
+}
+// --------------------------------------------------------------
 // zeta fn
-pub fn zeta3(z: Complex32, t: i32) -> Complex32 {
+// --------------------------------------------------------------
+pub fn zeta(z: Complex32, t: i32) -> Complex32 {
     if z.re > 10.0 {
         return Complex32::new(1.0, 0.0); // very rough approximation but this prevents overflow causing an err
     }
@@ -311,8 +420,9 @@ fn binom(n: i128, k: i128) -> i128 {
         r
     })
 }
-
+// --------------------------------------------------------------
 // lambertw
+// ----------------------------------------------------------------
 pub fn zexpz(z: Complex32) -> Complex32 {
     return z * z.exp();
 }

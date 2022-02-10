@@ -91,3 +91,7 @@ textarea {
     background: none;
     color: white;
 }
+.txtBtns {
+    display: flex;
+    width: 100px;
+}

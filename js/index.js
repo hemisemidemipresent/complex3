@@ -38,6 +38,7 @@ let multiplier = document.getElementById('gpuLevel').value;
 let isRotate = true;
 let isShiny = false;
 let isBW = true;
+let isLogHeight = false;
 
 let resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
 let graph = new THREE.Object3D();
@@ -114,8 +115,7 @@ function createMesh() {
                     'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
         } else {
             if (isBW) toggleBW();
-            legend.innerHTML =
-                'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
+            legend.innerHTML = 'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
         }
         let graph_type = 4;
         if (plot == 'Re-Im') {
@@ -125,7 +125,7 @@ function createMesh() {
             if (isBW) graph_type = 3;
             else graph_type = 2;
         }
-        let res = window.evaluate(inputBox.value, multiplier, graph_type);
+        let res = window.evaluate(inputBox.value, multiplier, graph_type, isLogHeight);
         let posLen = 3 * Math.pow(20 * multiplier + 1, 2);
         let pos = res.slice(0, posLen);
         let colors = res.slice(posLen);
@@ -230,7 +230,7 @@ function onWindowResize() {
 function render() {
     requestAnimationFrame(render);
     controls.update();
-    if (isRotate) graph.rotation.y += 0.001; // graph.rotation.y += 0.05 * clock.getDelta();
+    if (isRotate && isPerspective) graph.rotation.y += 0.001; // graph.rotation.y += 0.05 * clock.getDelta();
     renderer.render(scene, camera);
 }
 
@@ -267,10 +267,7 @@ function exportImg() {
     // image stuff
     let imgData = document.getElementsByTagName('canvas')[0].toDataURL('image/png');
     var element = document.createElement('a');
-    element.setAttribute(
-        'href',
-        imgData.replace(/^data:image\/[^;]/, 'data:application/octet-stream')
-    );
+    element.setAttribute('href', imgData.replace(/^data:image\/[^;]/, 'data:application/octet-stream'));
     element.setAttribute('download', 'graph.png');
     element.style.display = 'none';
 
@@ -300,6 +297,10 @@ function toggleBW() {
     load();
 }
 
+function toggleLog() {
+    isLogHeight = !isLogHeight;
+    load();
+}
 function toggleOrth() {
     isPerspective = !isPerspective;
     if (isPerspective) {
@@ -317,5 +318,6 @@ function toggleOrth() {
         );
         camera.position.set(0, 1000, 0);
         controls = new THREE.OrbitControls(camera, renderer.domElement);
+        graph.rotation.y = 0;
     }
 }

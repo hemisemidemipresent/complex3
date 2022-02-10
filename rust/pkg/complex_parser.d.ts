@@ -4,15 +4,16 @@
 * @param {string} input
 * @param {number} n
 * @param {number} graph_type
+* @param {boolean} log_height
 * @returns {Float32Array}
 */
-export function evaluate(input: string, n: number, graph_type: number): Float32Array;
+export function evaluate(input: string, n: number, graph_type: number, log_height: boolean): Float32Array;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly evaluate: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly evaluate: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;

@@ -21,7 +21,7 @@ pub use std::vec::Vec;
 pub use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn evaluate(input: &str, n: i16, graph_type: u8) -> Vec<f32> {
+pub fn evaluate(input: &str, n: i16, graph_type: u8, log_height: bool) -> Vec<f32> {
     let expr = ShuntingParser::parse_str(input).unwrap();
     let ctx = MathContext::new();
     let mut pos = Vec::new();
@@ -38,10 +38,41 @@ pub fn evaluate(input: &str, n: i16, graph_type: u8) -> Vec<f32> {
             // settles height
             match graph_type {
                 0 | 1 => {
-                    pos.push(remove_inf(result.re));
+                    let height = remove_inf(result.re);
+                    if log_height {
+                        if height == 0. {
+                            pos.push(0.);
+                        } else if height > 0. {
+                            pos.push((1. + height).ln());
+                        } else {
+                            pos.push(-(1. - height).ln());
+                        }
+                    } else {
+                        pos.push(height);
+                    }
                 }
-                2 | 3 => pos.push(remove_inf(result.im)),
-                _ => pos.push(remove_inf(result.norm())),
+                2 | 3 => {
+                    let height = remove_inf(result.im);
+                    if log_height {
+                        if height == 0. {
+                            pos.push(0.);
+                        } else if height > 0. {
+                            pos.push((1. + height).ln());
+                        } else {
+                            pos.push(-(1. - height).ln());
+                        }
+                    } else {
+                        pos.push(height);
+                    }
+                }
+                _ => {
+                    let height = remove_inf(result.norm());
+                    if log_height {
+                        pos.push((1.0 + height).ln());
+                    } else {
+                        pos.push(height);
+                    }
+                }
             }
             // settles color
             match graph_type {
