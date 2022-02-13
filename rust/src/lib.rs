@@ -109,9 +109,9 @@ pub fn evaluate(input: &str, n: i16, graph_type: u8, log_height: bool) -> Vec<f3
 
 fn remove_inf(val: f32) -> f32 {
     match val {
-        f32::NAN => return 1E+5,
-        INFINITY => return 1E+5,
-        NEG_INFINITY => return -1E+5,
+        f32::NAN => return 1E+38,
+        INFINITY => return 1E+38,
+        NEG_INFINITY => return -1E+38,
         _ => return val,
     }
 }

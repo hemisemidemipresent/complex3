@@ -316,7 +316,7 @@ function toggleOrth() {
             1,
             1000
         );
-        camera.position.set(0, 1000, 0);
+        camera.position.set(0, 100, 0);
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         graph.rotation.y = 0;
     }
