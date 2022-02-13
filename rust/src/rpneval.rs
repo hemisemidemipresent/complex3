@@ -3,7 +3,7 @@ use crate::parser::RPNExpr;
 use num_complex::{Complex32, Complex64};
 use spfunc::gamma::{digamma, gamma_ln};
 use std::collections::HashMap;
-use std::f32::consts::PI;
+use std::f32::consts::{E, PI};
 pub use std::f32::{INFINITY, NEG_INFINITY};
 
 // its a secret tool that will help us later
@@ -42,7 +42,11 @@ impl MathContext {
             match *token {
                 MathToken::Number(num) => operands.push(Complex32::new(num, 0.)),
                 MathToken::Imaginary(num) => operands.push(Complex32::new(0., num)),
-                MathToken::Variable(_) => operands.push(z),
+                MathToken::Variable(ref name) => match &name[..] {
+                    "e" => operands.push(Complex32::new(E, 0.)),
+                    "z" | "x" => operands.push(z),
+                    _ => operands.push(Complex32::new(0., 0.)),
+                },
                 MathToken::BOp(ref op) => {
                     let r = operands.pop().ok_or(format!("Wrong number of arguments"))?;
                     let l = operands.pop().ok_or(format!("Wrong number of arguments"))?;
