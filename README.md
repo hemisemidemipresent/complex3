@@ -86,12 +86,12 @@ but there is no easy way to render such Mod-Arg plots. So the objective of this 
 
 ## What are Re-Im/Im-Re/Mod-Arg plots?
 
-For a complex-valued function, the complex input consists of 2 values (Real and Imaginary part i.e. `x+iy`) while the complex output similarly also consists of 2 values. This would require a 4-dimensional graph that we cannot visualize, however, so instead, we plot 3 values and leave the 4th one to color
+For a complex-valued function, the complex input consists of 2 values (Real and Imaginary part i.e. $x+iy$) while the complex output similarly also consists of 2 values. This would require a 4-dimensional graph that we cannot visualize, however, so instead, we plot 3 values and leave the 4th one to color
 
-For example for the given function f(x+iy) = w+iv
+For example for the given function $f(x+iy) = w+iv$
 
--   a Re-Im plot takes the real component of the output `w` and uses that as the height of the surface at a given point. the imaginary part `v` is sigmoid-ed to B/W value
--   a Im-Re plot, on the other hand takes the imaginary component of the output `v` and uses that as the height of the surface at a given point. the real part `w` is sigmoid-ed to B/W value
+-   a Re-Im plot takes the real component of the output $w$ and uses that as the height of the surface at a given point. the imaginary part $v$ is sigmoid-ed to B/W value
+-   a Im-Re plot, on the other hand takes the imaginary component of the output $v$ and uses that as the height of the surface at a given point. the real part $w$ is sigmoid-ed to B/W value
 -   a Mod-Arg plot takes the **modulus** as the height and the **argument**:
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932965860870586478/unknown.png)
@@ -102,24 +102,24 @@ note: for functions with asymptotes/large changes in gradient it is necessary to
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932969004719562772/unknown.png?width=600&height=300)
 
-> tan(z), Mod-Arg
+> $\tan(z)$ (`tan(z)`), Mod-Arg
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932970020332527616/unknown.png?width=600&height=300)
 
-> gamma(z), Mod-Arg
+> $\Gamma(z)$ (`gamma(z)`), Mod-Arg
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932970810426163231/unknown.png?width=600&height=300)
 
-> sec(z), Re-Im, colored
+> $\sec(z)$ (`sec(z)`), Re-Im, colored
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932972496720904252/unknown.png?width=600&height=300)
 
-> sinh(z), Mod-Arg
+> $\sinh(z)$ (`sinh(z)`), Mod-Arg
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932975183021637662/unknown.png?width=600&height=300)
 
-> 4asin(z/4), Re-Im
+> $4sin^{-1}\frac{z}{4}$ (`4asin(z/4)`), Re-Im
 
 ![](https://media.discordapp.net/attachments/699781597515481159/932975915703627796/unknown.png?width=600&height=300)
 
-> 1/(1+(z/5)^2), Re-Im, colored, you can see the 2 asymptotes at z=±i that causes the radius of convergence to be 1
+> `1/(1+(z/5)^2)`, Re-Im, colored, you can see the 2 asymptotes at z=±i that causes the radius of convergence to be 1
