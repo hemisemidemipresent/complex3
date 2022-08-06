@@ -70,13 +70,13 @@ but there is no easy way to render such Mod-Arg plots. So the objective of this 
 
 ## TODO
 
--   [ ] Logarithmic height option
 -   [ ] cut off after certain height option
 -   [ ] Export to a `.stl` file 3D printing (probably defer [this](https://github.com/eligrey/FileSaver.js/) or smth)
 -   [ ] Opacity, Saturation, Value option
 
 ### Done
 
+-   [x] Logarithmic height option
 -   [x] Hide title option
 -   [x] Add an option for how many points u want in a mesh (aka how good is your device)
 -   [x] Mod-Arg, Im-Re plot
@@ -86,9 +86,9 @@ but there is no easy way to render such Mod-Arg plots. So the objective of this 
 
 ## What are Re-Im/Im-Re/Mod-Arg plots?
 
-for a complex-valued function, the complex input consists of 2 values (Real and Imaginary part i.e. `x+iy`) while the complex output similarly also consists of 2 values. This would require a 4-dimensional graph that we cannot visualize, however, so instead, we plot 3 values and leave the 4th one to color
+For a complex-valued function, the complex input consists of 2 values (Real and Imaginary part i.e. `x+iy`) while the complex output similarly also consists of 2 values. This would require a 4-dimensional graph that we cannot visualize, however, so instead, we plot 3 values and leave the 4th one to color
 
-for example for the given function f(x+iy) = w+iv
+For example for the given function f(x+iy) = w+iv
 
 -   a Re-Im plot takes the real component of the output `w` and uses that as the height of the surface at a given point. the imaginary part `v` is sigmoid-ed to B/W value
 -   a Im-Re plot, on the other hand takes the imaginary component of the output `v` and uses that as the height of the surface at a given point. the real part `w` is sigmoid-ed to B/W value
