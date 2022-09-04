@@ -274,7 +274,7 @@ pub fn trigamma(z: Complex32) -> Complex32 {
     return psi;
 }
 // --------------------------------------------------------------
-// polygamma fn
+// polygamma fn (not working)
 // --------------------------------------------------------------
 pub fn polygamma32(z: Complex32, m: i32) -> Complex32 {
     let z64 = Complex64::new(z.re as f64, z.im as f64);
@@ -441,7 +441,6 @@ pub fn zexpz_dd(z: Complex32) -> Complex32 {
 }
 
 pub fn init_point(z: Complex32, k: i32) -> Complex32 {
-    let i = Complex32::new(0., 1.);
     let two_pi_k_i = Complex32::new(0., 2. * PI * k as f32);
     let mut ip = z.ln() + two_pi_k_i - (z.ln() + two_pi_k_i).ln(); // initial point coming from the general asymptotic approximation
     let p = (Complex32::new(2., 0.) * (z.exp() + Complex32::new(1., 0.))).sqrt(); // used when we are close to the branch cut around zero and when k=0,-1
