@@ -27,10 +27,7 @@ function initRenderer() {
 }
 
 const clock = new THREE.Clock();
-const light = new THREE.DirectionalLight(0xffffff, 0.75);
-light.position.setScalar(10);
-scene.add(light);
-scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+scene.add(new THREE.AmbientLight(0xffffff, 1));
 
 const color = 0xd69dff;
 const length = 10;
@@ -100,19 +97,11 @@ function createMesh() {
         let plane = new THREE.PlaneBufferGeometry(width, height, segments, segments);
         let legend = document.getElementById('legend');
         if (plot == 'Re-Im') {
-            if (isBW)
-                legend.innerHTML =
-                    'height of surface = Re(f(z))<br>color of surface - white = bigger Im(f(z)), black = smaller Im(f(z))';
-            else
-                legend.innerHTML =
-                    'height of surface = Re(f(z))<br>color of surface - magenta = bigger Im(f(z)), light cyan = 0, red = smaller Im(f(z))';
+            legend.innerHTML =
+                'height of surface = Re(f(z))<br>color of surface - brighter = bigger Im(f(z)), darker = smaller Im(f(z))';
         } else if (plot == 'Im-Re') {
-            if (isBW)
-                legend.innerHTML =
-                    'height of surface = Im(f(z))<br>color of surface - magenta = bigger Re(f(z)), red = smaller Re(f(z))';
-            else
-                legend.innerHTML =
-                    'height of surface = Im(f(z))<br>color of surface - white = bigger Re(f(z)), black = smaller Re(f(z))';
+            legend.innerHTML =
+                'height of surface = Re(f(z))<br>color of surface - brighter = bigger Re(f(z)), darker = smaller Re(f(z))';
         } else {
             if (isBW) toggleBW();
             legend.innerHTML = 'height of surface = modulus of output<br>color of surface - argument of output (R→G→B)';
@@ -126,6 +115,7 @@ function createMesh() {
             else graph_type = 2;
         }
         let res = window.evaluate(inputBox.value, multiplier, graph_type, isLogHeight);
+
         let posLen = 3 * Math.pow(20 * multiplier + 1, 2);
         let pos = res.slice(0, posLen);
         let colors = res.slice(posLen);
