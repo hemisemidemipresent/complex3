@@ -129,7 +129,7 @@ pub fn evaluate(input: &str, n: i16, graph_type: u8, log_height: bool) -> Vec<f3
             }
         }
     }
-    pos.append(&mut color);
+    pos.append(&mut color); // add color array to the position array (thats just how threejs works)
     return pos;
 }
 
@@ -210,6 +210,8 @@ fn hsvcolor(mut h: f32, s: f32, v: f32) -> Vec<f32> {
 fn gradient(y: f32) -> Vec<f32> {
     let gradient = colorous::INFERNO;
     let color = gradient.eval_continuous(sig(y) as f64);
+
+    // the rgb has to be from 0-1
     let mut vec = Vec::new();
     vec.push((color.r as f32) / 256.);
     vec.push((color.g as f32) / 256.);
