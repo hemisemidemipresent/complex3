@@ -10,9 +10,13 @@ parser infrastructure is from https://github.com/rodolf0/tox/
 | `3`         | Im-Re, BW        |
 | `4`         | Mod-Arg, (Color) |
 
+run the following to build:
+
 ```
 wasm-pack build --target web
 ```
+
+Add the following 2 lines of code at the bottom of `./pkg/complex_parser.js`
 
 ```js
 window.init = init;
