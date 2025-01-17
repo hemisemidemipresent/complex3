@@ -2,12 +2,12 @@
 
 [A 3D web-based complex function grapher](https://hemisemidemipresent.github.io/complex3/)
 
-<img src="https://github.com/hemisemidemipresent/complex3/blob/main/imgs/Re-Im.png" height=600/>
+<img src="https://github.com/hemisemidemipresent/complex3/blob/main/imgs/Re-Im.png"/>
 
 
 > example of a Re-Im plot
 
-<img src="https://github.com/hemisemidemipresent/complex3/blob/main/imgs/Mod-Arg.png" height=600/>
+<img src="https://github.com/hemisemidemipresent/complex3/blob/main/imgs/Mod-Arg.png"/>
 
 > example of a Mod-Arg plot
 
